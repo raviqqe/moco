@@ -1,3 +1,5 @@
+use crate::error::Error;
+
 const CONS_FIELD_COUNT: usize = 2;
 
 /// A memory on a virtual machine.
