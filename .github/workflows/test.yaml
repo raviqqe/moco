@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: rust
+        working-directory: vm/rust
     steps:
       - uses: actions/checkout@v5
       - uses: raviqqe/cargo-cache@v1
