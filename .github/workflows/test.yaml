@@ -1,0 +1,26 @@
+name: test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vm/rust
+    steps:
+      - uses: actions/checkout@v5
+      - uses: raviqqe/cargo-cache@v1
+      - run: cargo build
+      - run: cargo fmt -- --check
+      - run: cargo clippy -- -D warnings
+      - run: cargo test
+  test:
+    needs:
+      - rust
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: for result in ${{ join(needs.*.result, ' ') }}; do [ $result = success ]; done
