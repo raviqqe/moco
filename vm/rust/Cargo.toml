@@ -5,7 +5,7 @@ edition = "2024"
 description = "The tiny virtual machine"
 readme = "../../README.md"
 repository = "https://github.com/raviqqe/moco-vm"
-license = "unlicense"
+license = "Unlicense"
 keywords = ["interpreter", "language"]
 categories = ["no-std", "no-std::no-alloc", "wasm"]
 
