@@ -2,6 +2,7 @@
 name = "moco-vm"
 version = "0.1.0"
 edition = "2024"
+description = "The tiny virtual machine"
 readme = "../../README.md"
 repository = "https://github.com/raviqqe/moco-vm"
 license = "unlicense"
