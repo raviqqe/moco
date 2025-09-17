@@ -1,4 +1,6 @@
+use crate::cons::{Cons, NEVER};
 use crate::error::Error;
+use crate::value::Value;
 
 const CONS_FIELD_COUNT: usize = 2;
 
@@ -29,15 +31,12 @@ impl<'a> Memory<'a> {
 
     // Garbage collection
 
-    /// Collects garbage memory blocks.
+    /// Collects cons cells not referenced anymore.
     pub fn collect_garbages(&mut self, cons: Option<&mut Cons>) -> Result<(), Error> {
         self.allocation_index = 0;
         self.space = !self.space;
 
-        self.code = self.copy_cons(self.code)?;
-        self.stack = self.copy_cons(self.stack)?;
-        self.r#false = self.copy_cons(self.r#false)?;
-        self.register = self.copy_cons(self.register)?;
+        self.root = self.copy_cons(self.root)?;
 
         if let Some(cons) = cons {
             *cons = self.copy_cons(*cons)?;

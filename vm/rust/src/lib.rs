@@ -2,6 +2,10 @@
 
 #![no_std]
 
+mod cons;
 mod error;
-mod memory;
+// TODO
+// mod memory;
+mod number;
+mod value;
 mod vm;
