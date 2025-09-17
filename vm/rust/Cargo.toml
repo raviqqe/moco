@@ -2,5 +2,10 @@
 name = "moco-vm"
 version = "0.1.0"
 edition = "2024"
+readme = "../../README.md"
+repository = "https://github.com/raviqqe/moco-vm"
+license = "unlicense"
+keywords = ["interpreter", "language"]
+categories = ["no-std", "no-std::no-alloc", "wasm"]
 
 [dependencies]
