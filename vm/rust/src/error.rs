@@ -4,7 +4,7 @@ use core::{
 };
 
 /// An error of a virtual machine.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Error {
     /// Out of memory.
     OutOfMemory,
