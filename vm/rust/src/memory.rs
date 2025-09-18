@@ -1,14 +1,10 @@
 use crate::cons::Cons;
 use crate::error::Error;
-use crate::integer::Integer;
 use crate::{heap::Heap, value::Value};
-
-// TODO
-// const CONS_FIELD_COUNT: usize = 2;
 
 macro_rules! assert_heap_index {
     ($self:expr, $index:expr) => {
-        debug_assert!($index.to_usize() < $self.heap.as_ref().len());
+        debug_assert!($index < $self.heap.as_ref().len());
     };
 }
 

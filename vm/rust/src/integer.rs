@@ -28,9 +28,6 @@ pub trait Integer:
 
     /// A mask.
     const MASK: Self;
-
-    /// Converts an integer to `usize`.
-    fn to_usize(self) -> usize;
 }
 
 macro_rules! impl_integer {
@@ -38,10 +35,6 @@ macro_rules! impl_integer {
         impl Integer for $type {
             const BITS: usize = Self::BITS as _;
             const MASK: Self = Self::MAX;
-
-            fn to_usize(self) -> usize {
-                self as usize
-            }
         }
     };
 }
