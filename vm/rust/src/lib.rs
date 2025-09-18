@@ -2,6 +2,6 @@
 
 #![no_std]
 
-pub const fn add(x: usize, y: usize) -> usize {
-    x + y
-}
+mod value;
+
+pub use value::Value;
