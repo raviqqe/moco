@@ -16,16 +16,16 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     fn from_cons(cons: Self::Cons) -> Self;
 
     /// Converts a value to a cons.
-    fn to_cons(value: Self) -> Self::Cons;
+    fn to_cons(self) -> Self::Cons;
 
     /// Checks if a value is a cons.
-    fn is_cons(value: Self) -> bool;
+    fn is_cons(self) -> bool;
 
     /// Converts a number to a value.
     fn from_number(number: Self::Number) -> Self;
 
     /// Converts a value to a number.
-    fn to_number(value: Self) -> Self::Number;
+    fn to_number(self) -> Self::Number;
 }
 
 /// A 32-bit value.
@@ -43,13 +43,13 @@ impl Value for Value32 {
     }
 
     #[inline]
-    fn to_cons(value: Self) -> Self::Cons {
-        value.0 >> 1
+    fn to_cons(self) -> Self::Cons {
+        self.0 >> 1
     }
 
     #[inline]
-    fn is_cons(value: Self) -> bool {
-        value.0 & 1 == 0
+    fn is_cons(self) -> bool {
+        self.0 & 1 == 0
     }
 
     #[inline]
@@ -58,8 +58,8 @@ impl Value for Value32 {
     }
 
     #[inline]
-    fn to_number(value: Self) -> Self::Number {
-        (value.0 >> 1) as _
+    fn to_number(self) -> Self::Number {
+        self.0 as Self::Number >> 1
     }
 }
 
@@ -78,13 +78,13 @@ impl Value for Value64 {
     }
 
     #[inline]
-    fn to_cons(value: Self) -> Self::Cons {
-        value.0 >> 1
+    fn to_cons(self) -> Self::Cons {
+        self.0 >> 1
     }
 
     #[inline]
-    fn is_cons(value: Self) -> bool {
-        value.0 & 1 == 0
+    fn is_cons(self) -> bool {
+        self.0 & 1 == 0
     }
 
     #[inline]
@@ -93,7 +93,53 @@ impl Value for Value64 {
     }
 
     #[inline]
-    fn to_number(value: Self) -> Self::Number {
-        (value.0 >> 1) as _
+    fn to_number(self) -> Self::Number {
+        self.0 as Self::Number >> 1
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    macro_rules! test_value {
+        ($name:ident, $value:ty) => {
+            mod $name {
+                use super::*;
+
+                fn from_cons(cons: <$value as Value>::Cons) -> $value {
+                    <$value as Value>::from_cons(cons)
+                }
+
+                fn from_number(number: <$value as Value>::Number) -> $value {
+                    <$value as Value>::from_number(number)
+                }
+
+                #[test]
+                fn convert_cons() {
+                    assert_eq!(from_cons(0).to_cons(), 0);
+                    assert_eq!(from_cons(1).to_cons(), 1);
+                    assert_eq!(from_cons(42).to_cons(), 42);
+                }
+
+                #[test]
+                fn check_cons() {
+                    assert!(from_cons(0).is_cons());
+                    assert!(!from_number(0).is_cons());
+                }
+
+                #[test]
+                fn convert_number() {
+                    assert_eq!(from_number(-42).to_number(), -42);
+                    assert_eq!(from_number(-1).to_number(), -1);
+                    assert_eq!(from_number(0).to_number(), 0);
+                    assert_eq!(from_number(1).to_number(), 1);
+                    assert_eq!(from_number(42).to_number(), 42);
+                }
+            }
+        };
+    }
+
+    test_value!(value32, Value32);
+    test_value!(value64, Value64);
 }
