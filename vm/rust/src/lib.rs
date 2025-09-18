@@ -6,4 +6,4 @@ mod integer;
 mod value;
 
 pub use integer::Integer;
-pub use value::{Value, Value64};
+pub use value::{Value, Value32, Value64};
