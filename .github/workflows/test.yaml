@@ -22,8 +22,8 @@ jobs:
       - run: echo BUILD_OPTIONS="--features ${{ matrix.features }}" >> ${{ github.env }}
       - run: cargo build $BUILD_OPTIONS
       - run: cargo fmt -- --check
-      - run: cargo clippy  $BUILD_OPTIONS -- -D warnings
-      - run: cargo test  $BUILD_OPTIONS
+      - run: cargo clippy $BUILD_OPTIONS -- -D warnings
+      - run: cargo test $BUILD_OPTIONS
   test:
     needs:
       - rust
