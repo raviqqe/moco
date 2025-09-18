@@ -47,7 +47,7 @@ macro_rules! impl_cons {
             }
 
             fn tag(self) -> Self::Tag {
-                ((self.0 >> 1) & Self::Tag::MASK as Self::Raw) as _
+                (self.0 >> 1) as Self::Tag & Self::Tag::MASK
             }
 
             fn to_raw(self) -> Self::Raw {
