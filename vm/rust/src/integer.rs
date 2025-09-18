@@ -24,7 +24,7 @@ pub trait Integer:
     + Display
 {
     /// A size in bits.
-    const BITS: u32;
+    const BITS: usize;
 
     /// A mask.
     const MASK: Self;
@@ -36,7 +36,7 @@ pub trait Integer:
 macro_rules! impl_integer {
     ($type:ty) => {
         impl Integer for $type {
-            const BITS: u32 = Self::BITS;
+            const BITS: usize = Self::BITS as _;
             const MASK: Self = Self::MAX;
 
             fn to_usize(self) -> usize {
