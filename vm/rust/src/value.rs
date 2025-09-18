@@ -32,69 +32,46 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value32(u32);
 
-impl Value for Value32 {
-    type Cons = Cons32;
-    type Number = i32;
-
-    #[inline]
-    fn from_cons(cons: Self::Cons) -> Self {
-        Self(cons.to_raw())
-    }
-
-    #[inline]
-    fn to_cons(self) -> Self::Cons {
-        Self::Cons::from_raw(self.0)
-    }
-
-    #[inline]
-    fn is_cons(self) -> bool {
-        self.0 & 1 == 0
-    }
-
-    #[inline]
-    fn from_number(number: Self::Number) -> Self {
-        Self(((number << 1) | 1) as _)
-    }
-
-    #[inline]
-    fn to_number(self) -> Self::Number {
-        self.0 as Self::Number >> 1
-    }
-}
-
 /// A 64-bit value.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value64(u64);
 
-impl Value for Value64 {
-    type Cons = Cons64;
-    type Number = i64;
+macro_rules! impl_value {
+    ($value:ty, $cons:ty, $number:ty) => {
+        impl Value for $value {
+            type Cons = $cons;
+            type Number = $number;
 
-    #[inline]
-    fn from_cons(cons: Self::Cons) -> Self {
-        Self(cons.to_raw())
-    }
+            #[inline]
+            fn from_cons(cons: Self::Cons) -> Self {
+                Self(cons.to_raw())
+            }
 
-    #[inline]
-    fn to_cons(self) -> Self::Cons {
-        Self::Cons::from_raw(self.0)
-    }
+            #[inline]
+            fn to_cons(self) -> Self::Cons {
+                Self::Cons::from_raw(self.0)
+            }
 
-    #[inline]
-    fn is_cons(self) -> bool {
-        self.0 & 1 == 0
-    }
+            #[inline]
+            fn is_cons(self) -> bool {
+                self.0 & 1 == 0
+            }
 
-    #[inline]
-    fn from_number(number: Self::Number) -> Self {
-        Self(((number << 1) | 1) as _)
-    }
+            #[inline]
+            fn from_number(number: Self::Number) -> Self {
+                Self(((number << 1) | 1) as _)
+            }
 
-    #[inline]
-    fn to_number(self) -> Self::Number {
-        self.0 as Self::Number >> 1
-    }
+            #[inline]
+            fn to_number(self) -> Self::Number {
+                self.0 as Self::Number >> 1
+            }
+        }
+    };
 }
+
+impl_value!(Value32, Cons32, i32);
+impl_value!(Value64, Cons64, i64);
 
 #[cfg(test)]
 mod tests {
