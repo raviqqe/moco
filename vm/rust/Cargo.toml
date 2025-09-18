@@ -10,3 +10,6 @@ keywords = ["interpreter", "language"]
 categories = ["no-std", "no-std::no-alloc", "wasm"]
 
 [dependencies]
+
+[features]
+alloc = []
