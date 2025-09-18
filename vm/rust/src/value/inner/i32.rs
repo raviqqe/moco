@@ -2,17 +2,17 @@ pub type InnerNumber = i32;
 pub type InnerValue = u32;
 
 #[inline]
-pub const fn box_cons(cons: u32) -> u32 {
+pub const fn box_cons(cons: InnerValue) -> InnerValue {
     cons << 1
 }
 
 #[inline]
-pub const fn unbox_cons(cons: u32) -> u32 {
+pub const fn unbox_cons(cons: InnerValue) -> InnerValue {
     cons >> 1
 }
 
 #[inline]
-pub const fn is_cons(value: u32) -> bool {
+pub const fn is_cons(value: InnerValue) -> bool {
     value & 1 == 0
 }
 
@@ -37,11 +37,11 @@ pub const fn to_i64(number: InnerNumber) -> i64 {
 }
 
 #[inline]
-pub const fn from_raw(raw: u32) -> InnerNumber {
+pub const fn from_raw(raw: InnerValue) -> InnerNumber {
     raw as _
 }
 
 #[inline]
-pub const fn to_raw(number: InnerNumber) -> u32 {
+pub const fn to_raw(number: InnerNumber) -> InnerValue {
     number as _
 }
