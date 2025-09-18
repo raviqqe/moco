@@ -25,6 +25,10 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     fn is_pointer(self) -> bool;
 }
 
+/// A 16-bit value.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Value16(u16);
+
 /// A 32-bit value.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value32(u32);
@@ -67,6 +71,7 @@ macro_rules! impl_value {
     };
 }
 
+impl_value!(Value16, i16, u16);
 impl_value!(Value32, i32, u32);
 impl_value!(Value64, i64, u64);
 
