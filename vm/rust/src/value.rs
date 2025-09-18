@@ -28,6 +28,7 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     fn to_number(value: Self) -> Self::Number;
 }
 
+/// A 64-bit value.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value64(u64);
 
