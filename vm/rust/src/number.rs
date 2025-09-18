@@ -1,7 +1,7 @@
 use crate::{
     Error,
     value::Value,
-    value_inner::{self, NumberInner},
+    value::inner::{self, NumberInner},
 };
 use core::{
     fmt::{self, Display, Formatter},

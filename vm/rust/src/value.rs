@@ -1,9 +1,8 @@
-mod inner;
+pub mod inner;
 
 use crate::{
     cons::{Cons, Tag},
     number::Number,
-    value_inner,
 };
 use core::fmt::{self, Display, Formatter};
 
@@ -69,7 +68,7 @@ impl Value {
     /// Checks if it is a cons.
     #[inline]
     pub const fn is_cons(&self) -> bool {
-        value_inner::is_cons(self.0)
+        inner::is_cons(self.0)
     }
 
     /// Checks if it is a number.
