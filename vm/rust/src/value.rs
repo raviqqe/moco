@@ -8,7 +8,7 @@ use core::fmt::Debug;
 pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     /// A cons.
     ///
-    /// Note that its internal representation must be compatible with values'.
+    /// Note that its internal representation must be compatible with values.
     type Cons: Cons;
 
     /// A number.
