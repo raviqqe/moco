@@ -33,4 +33,7 @@ pub trait Value {
         + Display;
 }
 
-impl Value for i64 {}
+impl Value for i64 {
+    type Number = i64;
+    type Tag = u16;
+}
