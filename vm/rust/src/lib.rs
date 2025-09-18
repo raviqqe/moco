@@ -2,6 +2,8 @@
 
 #![no_std]
 
-pub const fn add(x: usize, y: usize) -> usize {
-    x + y
-}
+mod integer;
+mod value;
+
+pub use integer::Integer;
+pub use value::{Value, Value32, Value64};
