@@ -105,6 +105,10 @@ mod tests {
             mod $name {
                 use super::*;
 
+                fn cons(index: <<$value as Value>::Cons as Cons>::Raw) -> <$value as Value>::Cons {
+                    <$value as Value>::Cons::new(index)
+                }
+
                 fn from_cons(cons: <$value as Value>::Cons) -> $value {
                     <$value as Value>::from_cons(cons)
                 }
@@ -115,14 +119,14 @@ mod tests {
 
                 #[test]
                 fn convert_cons() {
-                    assert_eq!(from_cons(0).to_cons(), 0);
-                    assert_eq!(from_cons(1).to_cons(), 1);
-                    assert_eq!(from_cons(42).to_cons(), 42);
+                    assert_eq!(from_cons(cons(0)).to_cons().index(), 0);
+                    assert_eq!(from_cons(cons(1)).to_cons().index(), 1);
+                    assert_eq!(from_cons(cons(42)).to_cons().index(), 42);
                 }
 
                 #[test]
                 fn check_cons() {
-                    assert!(from_cons(0).is_cons());
+                    assert!(from_cons(cons(0)).is_cons());
                     assert!(!from_number(0).is_cons());
                 }
 
