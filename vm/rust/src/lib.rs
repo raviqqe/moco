@@ -5,6 +5,7 @@
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
+mod heap;
 mod integer;
 mod value;
 
