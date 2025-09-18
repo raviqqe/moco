@@ -4,6 +4,29 @@ use crate::{heap::Heap, value::Value};
 // TODO
 // const CONS_FIELD_COUNT: usize = 2;
 
+macro_rules! assert_heap_index {
+    ($self:expr, $index:expr) => {
+        debug_assert!(0 <= $index);
+        debug_assert!($index < $self.heap.as_ref().len());
+    };
+}
+
+macro_rules! assert_heap_cons {
+    ($self:expr, $cons:expr, $value:ty) => {
+        if $cons != <$value as Value>::Cons::default() {
+            assert_heap_index!($self, $cons.into());
+        }
+    };
+}
+
+macro_rules! assert_heap_value {
+    ($self:expr, $cons:expr, $value:ty) => {
+        if $cons.is_cons() {
+            assert_heap_cons!($self, $cons.to_cons(), $value);
+        }
+    };
+}
+
 /// A memory on a virtual machine.
 pub struct Memory<V: Value, H: Heap<V>> {
     root: V::Cons,
@@ -33,7 +56,9 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
     /// Returns a value at an index.
     #[inline]
-    pub fn get<const G: bool>(&self, index: usize) -> Result<V, Error> {
+    pub fn get(&self, index: usize) -> Result<V, Error> {
+        assert_heap_index!(self, index);
+
         self.heap
             .as_ref()
             .get(index)
@@ -43,7 +68,9 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
     /// Sets a value at an index.
     #[inline]
-    pub fn set<const G: bool>(&mut self, index: usize, value: V) -> Result<(), Error> {
+    pub fn set(&mut self, index: usize, value: V) -> Result<(), Error> {
+        assert_heap_index!(self, index);
+
         *self
             .heap
             .as_mut()
@@ -59,9 +86,9 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         let mut cons = self.allocate_unchecked(car, cdr)?;
 
         debug_assert_eq!(cons.tag(), V::Tag::default());
-        assert_heap_cons!(self, cons);
-        assert_heap_value!(self, car);
-        assert_heap_value!(self, cdr);
+        assert_heap_cons!(self, cons, V);
+        assert_heap_value!(self, car, V);
+        assert_heap_value!(self, cdr, V);
 
         if self.is_out_of_memory() || cfg!(feature = "gc_always") {
             self.collect_garbages(Some(&mut cons))?;
@@ -70,13 +97,18 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         Ok(cons)
     }
 
+    fn allocate_unchecked(&mut self, _car: V, _cdr: V) -> Result<V::Cons, Error> {
+        // TODO
+        Ok(V::Cons::default())
+    }
+
     // TODO
     fn is_out_of_memory(&self) -> bool {
         false
     }
 
     // TODO
-    fn collect_garbages(&mut self, cons: Option<&mut V::Cons>) -> Result<(), Error> {
+    fn collect_garbages(&mut self, _cons: Option<&mut V::Cons>) -> Result<(), Error> {
         Ok(())
     }
 }
