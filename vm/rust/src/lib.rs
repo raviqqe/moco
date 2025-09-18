@@ -2,6 +2,8 @@
 
 #![no_std]
 
+mod integer;
 mod value;
 
-pub use value::Value;
+pub use integer::Integer;
+pub use value::{Value, Value64};

@@ -1,58 +1,22 @@
-use core::{
-    fmt::{Debug, Display},
-    ops::{Add, Div, Mul, Sub},
-};
+use crate::Integer;
+use core::fmt::Debug;
 
 /// A value.
 pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     /// A cons.
-    type Cons: Add
-        + Sub
-        + PartialEq
-        + Eq
-        + PartialOrd
-        + Ord
-        + Clone
-        + Copy
-        + Default
-        + Debug
-        + Display;
+    type Cons: Integer;
 
     /// A number.
-    type Number: Add
-        + Sub
-        + Mul
-        + Div
-        + PartialEq
-        + Eq
-        + PartialOrd
-        + Ord
-        + Clone
-        + Copy
-        + Default
-        + Debug
-        + Display;
+    type Number: Integer;
 
     /// A tag.
-    type Tag: Add
-        + Sub
-        + Mul
-        + Div
-        + PartialEq
-        + Eq
-        + PartialOrd
-        + Ord
-        + Clone
-        + Copy
-        + Default
-        + Debug
-        + Display;
+    type Tag: Integer;
 
     /// Converts a cons to a value.
     fn from_cons(cons: Self::Cons) -> Self;
 
     /// Converts a value to a cons.
-    fn to_cons(cons: Self) -> Self::Cons;
+    fn to_cons(value: Self) -> Self::Cons;
 
     /// Checks if a value is a cons.
     fn is_cons(value: Self) -> bool;
@@ -61,38 +25,39 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     fn from_number(number: Self::Number) -> Self;
 
     /// Converts a value to a number.
-    fn to_number(number: Self::Number) -> Self;
+    fn to_number(value: Self) -> Self::Number;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
-struct I64Value(u64);
+pub struct Value64(u64);
 
-impl Value for I64Value {
+impl Value for Value64 {
+    type Cons = u64;
     type Number = i64;
     type Tag = u16;
 
     #[inline]
-    fn from_cons(cons: Self) -> Self {
-        cons << 1
+    fn from_cons(cons: Self::Cons) -> Self {
+        Self(cons << 1)
     }
 
     #[inline]
-    fn to_cons(cons: Self) -> Self {
-        cons >> 1
+    fn to_cons(value: Self) -> Self::Cons {
+        value.0 >> 1
     }
 
     #[inline]
     fn is_cons(value: Self) -> bool {
-        value & 1 == 0
+        value.0 & 1 == 0
     }
 
     #[inline]
     fn from_number(number: Self::Number) -> Self {
-        (number << 1) | 1
+        Self(((number << 1) | 1) as _)
     }
 
     #[inline]
-    fn to_number(number: Self::Number) -> Self {
-        number >> 1
+    fn to_number(value: Self) -> Self::Number {
+        (value.0 >> 1) as _
     }
 }
