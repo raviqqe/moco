@@ -1,20 +1,14 @@
-use crate::{error::Error, value::Value};
-use core::fmt::{self, Write};
+use crate::{Heap, value::Value};
 
 const CONS_FIELD_COUNT: usize = 2;
 
 /// A memory on a virtual machine.
-pub struct Memory<'a> {
-    code: Cons,
-    stack: Cons,
-    r#false: Cons,
-    register: Cons,
-    allocation_index: usize,
-    space: bool,
-    heap: &'a mut [Value],
+pub struct Memory<V, H: Heap<T>> {
+    root: V,
+    heap: H,
 }
 
-impl<'a> Memory<'a> {
+impl<T: Heap> Memory<T> {
     /// Creates a memory.
     pub fn new(heap: &'a mut [Value]) -> Result<Self, Error> {
         let mut memory = Self {
@@ -454,29 +448,5 @@ impl<'a> Memory<'a> {
             copy
         }
         .set_tag(cons.tag()))
-    }
-}
-
-impl Write for Memory<'_> {
-    fn write_str(&mut self, string: &str) -> fmt::Result {
-        (|| -> Result<(), Error> {
-            let mut list = self.null()?;
-            self.build_intermediate_string(string, &mut list)?;
-
-            if self.register() == self.null()? {
-                self.set_register(list);
-            } else {
-                let mut head = self.register();
-
-                while self.cdr(head)? != self.null()?.into() {
-                    head = self.cdr(head)?.assume_cons();
-                }
-
-                self.set_cdr(head, list.into())?;
-            }
-
-            Ok(())
-        })()
-        .map_err(|_| fmt::Error)
     }
 }
