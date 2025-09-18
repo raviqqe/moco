@@ -3,8 +3,8 @@ use crate::{heap::Heap, value::Value};
 const CONS_FIELD_COUNT: usize = 2;
 
 /// A memory on a virtual machine.
-pub struct Memory<V, H: Heap<V>> {
-    root: V,
+pub struct Memory<V: Value, H: Heap<V>> {
+    root: V::Cons,
     heap: H,
 }
 
@@ -19,14 +19,14 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
     /// Returns a code.
     #[inline]
-    pub const fn code(&self) -> Cons {
-        self.code
+    pub const fn root(&self) -> V::Cons {
+        self.root
     }
 
     /// Sets a code.
     #[inline]
-    pub const fn set_code(&mut self, value: Cons) {
-        self.code = value;
+    pub const fn set_code(&mut self, cons: V::Cons) {
+        self.root = cons;
     }
 
     // /// Returns a register.
