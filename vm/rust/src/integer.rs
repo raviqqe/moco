@@ -23,7 +23,9 @@ pub trait Integer:
     + Debug
     + Display
 {
+    /// A size in bits.
     const BITS: u32;
+    /// A mask.
     const MASK: Self;
 }
 
