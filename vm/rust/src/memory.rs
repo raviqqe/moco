@@ -1,3 +1,4 @@
+use crate::error::Error;
 use crate::{heap::Heap, value::Value};
 
 // TODO
@@ -18,16 +19,38 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         }
     }
 
-    /// Returns a code.
+    /// Returns a root.
     #[inline]
     pub const fn root(&self) -> V::Cons {
         self.root
     }
 
-    /// Sets a code.
+    /// Sets a root.
     #[inline]
-    pub const fn set_code(&mut self, cons: V::Cons) {
+    pub const fn set_root(&mut self, cons: V::Cons) {
         self.root = cons;
+    }
+
+    /// Returns a value at an index.
+    #[inline]
+    pub fn get<const G: bool>(&self, index: usize) -> Result<V, Error> {
+        self.heap
+            .as_ref()
+            .get(index)
+            .copied()
+            .ok_or(Error::InvalidMemoryAccess)
+    }
+
+    /// Sets a value at an index.
+    #[inline]
+    pub fn set<const G: bool>(&mut self, index: usize, value: V) -> Result<(), Error> {
+        *self
+            .heap
+            .as_mut()
+            .get_mut(index)
+            .ok_or(Error::InvalidMemoryAccess)? = value;
+
+        Ok(())
     }
 
     // /// Returns a register.
