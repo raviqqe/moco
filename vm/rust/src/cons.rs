@@ -8,6 +8,9 @@ pub trait Cons: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     /// A tag.
     type Tag: Integer;
 
+    /// Creates a cons.
+    fn new(index: Self::Raw) -> Self;
+
     /// Returns a memory index.
     fn index(self) -> Self::Raw;
 
@@ -28,6 +31,10 @@ pub struct Cons32(u32);
 impl Cons for Cons32 {
     type Raw = u32;
     type Tag = u8;
+
+    fn new(index: Self::Raw) -> Self {
+        Self(index << (Self::Tag::BITS + 1))
+    }
 
     fn index(self) -> Self::Raw {
         self.0 >> (Self::Tag::BITS + 1)
@@ -53,6 +60,10 @@ pub struct Cons64(u64);
 impl Cons for Cons64 {
     type Raw = u64;
     type Tag = u16;
+
+    fn new(index: Self::Raw) -> Self {
+        Self(index << (Self::Tag::BITS + 1))
+    }
 
     fn index(self) -> Self::Raw {
         self.0 >> (Self::Tag::BITS + 1)

@@ -1,4 +1,6 @@
+use crate::cons::Cons;
 use crate::error::Error;
+use crate::integer::Integer;
 use crate::{heap::Heap, value::Value};
 
 // TODO
@@ -6,15 +8,14 @@ use crate::{heap::Heap, value::Value};
 
 macro_rules! assert_heap_index {
     ($self:expr, $index:expr) => {
-        debug_assert!(0 <= $index);
-        debug_assert!($index < $self.heap.as_ref().len());
+        debug_assert!($index.to_usize() < $self.heap.as_ref().len());
     };
 }
 
 macro_rules! assert_heap_cons {
     ($self:expr, $cons:expr, $value:ty) => {
         if $cons != <$value as Value>::Cons::default() {
-            assert_heap_index!($self, $cons.into());
+            assert_heap_index!($self, $cons.index());
         }
     };
 }
@@ -85,7 +86,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
     pub fn allocate(&mut self, car: V, cdr: V) -> Result<V::Cons, Error> {
         let mut cons = self.allocate_unchecked(car, cdr)?;
 
-        debug_assert_eq!(cons.tag(), V::Cons::Tag::default());
+        debug_assert_eq!(cons.tag(), <<V as Value>::Cons as Cons>::Tag::default());
         assert_heap_cons!(self, cons, V);
         assert_heap_value!(self, car, V);
         assert_heap_value!(self, cdr, V);

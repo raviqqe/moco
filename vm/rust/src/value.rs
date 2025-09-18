@@ -38,12 +38,12 @@ impl Value for Value32 {
 
     #[inline]
     fn from_cons(cons: Self::Cons) -> Self {
-        Self(cons << 1)
+        Self(cons.to_raw())
     }
 
     #[inline]
     fn to_cons(self) -> Self::Cons {
-        self.0 >> 1
+        Self::Cons::from_raw(self.0)
     }
 
     #[inline]
@@ -72,12 +72,12 @@ impl Value for Value64 {
 
     #[inline]
     fn from_cons(cons: Self::Cons) -> Self {
-        Self(cons << 1)
+        Self(cons.to_raw())
     }
 
     #[inline]
     fn to_cons(self) -> Self::Cons {
-        self.0 >> 1
+        Self::Cons::from_raw(self.0)
     }
 
     #[inline]
