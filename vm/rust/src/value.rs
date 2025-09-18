@@ -1,16 +1,16 @@
-use crate::Integer;
+use crate::{
+    Cons, Integer,
+    cons::{Cons32, Cons64},
+};
 use core::fmt::Debug;
 
 /// A value.
 pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     /// A cons.
-    type Cons: Integer;
+    type Cons: Cons;
 
     /// A number.
     type Number: Integer;
-
-    /// A tag.
-    type Tag: Integer;
 
     /// Converts a cons to a value.
     fn from_cons(cons: Self::Cons) -> Self;
@@ -33,9 +33,8 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
 pub struct Value32(u32);
 
 impl Value for Value32 {
-    type Cons = u32;
+    type Cons = Cons32;
     type Number = i32;
-    type Tag = u8;
 
     #[inline]
     fn from_cons(cons: Self::Cons) -> Self {
@@ -68,9 +67,8 @@ impl Value for Value32 {
 pub struct Value64(u64);
 
 impl Value for Value64 {
-    type Cons = u64;
+    type Cons = Cons64;
     type Number = i64;
-    type Tag = u16;
 
     #[inline]
     fn from_cons(cons: Self::Cons) -> Self {

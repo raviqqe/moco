@@ -5,12 +5,14 @@
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
+mod cons;
 mod error;
 mod heap;
 mod integer;
 mod memory;
 mod value;
 
+pub use cons::Cons;
 pub use error::Error;
 pub use heap::Heap;
 pub use integer::Integer;

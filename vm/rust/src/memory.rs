@@ -85,7 +85,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
     pub fn allocate(&mut self, car: V, cdr: V) -> Result<V::Cons, Error> {
         let mut cons = self.allocate_unchecked(car, cdr)?;
 
-        debug_assert_eq!(cons.tag(), V::Tag::default());
+        debug_assert_eq!(cons.tag(), V::Cons::Tag::default());
         assert_heap_cons!(self, cons, V);
         assert_heap_value!(self, car, V);
         assert_heap_value!(self, cdr, V);
