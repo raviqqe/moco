@@ -24,11 +24,11 @@ pub trait Cons: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     fn from_raw(raw: Self::Raw) -> Self;
 }
 
-/// A 32-bit value.
+/// A 32-bit cons.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Cons32(u32);
 
-/// A 64-bit value.
+/// A 64-bit cons.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Cons64(u64);
 
