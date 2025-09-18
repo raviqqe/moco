@@ -23,11 +23,17 @@ pub trait Integer:
     + Debug
     + Display
 {
+    const BITS: u32;
 }
 
-impl Integer for i16 {}
-impl Integer for i32 {}
-impl Integer for i64 {}
-impl Integer for u16 {}
-impl Integer for u32 {}
-impl Integer for u64 {}
+macro_rules! impl_integer {
+    ($($t:ty),*) => {
+        $(
+            impl Integer for $t {
+                const BITS: u32 = Self::BITS;
+            }
+        )*
+    };
+}
+
+impl_integer!(i8, i16, i32, i64, i128, u8, u16, u32, u64, u128);
