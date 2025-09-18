@@ -28,56 +28,38 @@ pub trait Cons: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Cons32(u32);
 
-impl Cons for Cons32 {
-    type Raw = u32;
-    type Tag = u8;
-
-    fn new(index: Self::Raw) -> Self {
-        Self(index << (Self::Tag::BITS + 1))
-    }
-
-    fn index(self) -> Self::Raw {
-        self.0 >> (Self::Tag::BITS + 1)
-    }
-
-    fn tag(self) -> Self::Tag {
-        ((self.0 >> 1) & Self::Tag::MASK as Self::Raw) as _
-    }
-
-    fn to_raw(self) -> Self::Raw {
-        self.0
-    }
-
-    fn from_raw(raw: Self::Raw) -> Self {
-        Self(raw)
-    }
-}
-
 /// A 64-bit value.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Cons64(u64);
 
-impl Cons for Cons64 {
-    type Raw = u64;
-    type Tag = u16;
+macro_rules! impl_cons {
+    ($cons:ty, $raw:ty, $tag:ty) => {
+        impl Cons for $cons {
+            type Raw = $raw;
+            type Tag = $tag;
 
-    fn new(index: Self::Raw) -> Self {
-        Self(index << (Self::Tag::BITS + 1))
-    }
+            fn new(index: Self::Raw) -> Self {
+                Self(index << (Self::Tag::BITS + 1))
+            }
 
-    fn index(self) -> Self::Raw {
-        self.0 >> (Self::Tag::BITS + 1)
-    }
+            fn index(self) -> Self::Raw {
+                self.0 >> (Self::Tag::BITS + 1)
+            }
 
-    fn tag(self) -> Self::Tag {
-        ((self.0 >> 1) & Self::Tag::MASK as Self::Raw) as _
-    }
+            fn tag(self) -> Self::Tag {
+                ((self.0 >> 1) & Self::Tag::MASK as Self::Raw) as _
+            }
 
-    fn to_raw(self) -> Self::Raw {
-        self.0
-    }
+            fn to_raw(self) -> Self::Raw {
+                self.0
+            }
 
-    fn from_raw(raw: Self::Raw) -> Self {
-        Self(raw)
-    }
+            fn from_raw(raw: Self::Raw) -> Self {
+                Self(raw)
+            }
+        }
+    };
 }
+
+impl_cons!(Cons32, u32, u8);
+impl_cons!(Cons64, u64, u16);
