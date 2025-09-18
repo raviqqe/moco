@@ -4,7 +4,7 @@ use core::fmt::{self, Display, Formatter};
 /// A tag.
 pub type Tag = u16;
 
-pub(crate) const NEVER: Cons = Cons::new(1); // A cons can never point an odd index.
+pub(crate) const NEVER: Cons = Cons::new(1); // A cons never points an odd index.
 
 const TAG_SIZE: usize = Tag::BITS as usize;
 const TAG_MASK: u64 = Tag::MAX as u64;
