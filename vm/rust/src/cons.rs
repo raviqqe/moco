@@ -1,4 +1,4 @@
-use crate::{Error, value::Value, value_inner};
+use crate::{Error, value::Value, value::inner};
 use core::fmt::{self, Display, Formatter};
 
 /// A tag.
@@ -45,12 +45,12 @@ impl Cons {
 
     #[inline]
     const fn r#box(value: u64) -> Self {
-        Self(value_inner::box_cons(value))
+        Self(inner::box_cons(value))
     }
 
     #[inline]
     const fn unbox(self) -> u64 {
-        value_inner::unbox_cons(self.0)
+        inner::unbox_cons(self.0)
     }
 
     #[inline]

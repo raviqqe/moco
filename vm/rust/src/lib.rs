@@ -2,6 +2,9 @@
 
 #![no_std]
 
+#[cfg(test)]
+extern crate alloc;
+
 mod cons;
 mod error;
 mod number;

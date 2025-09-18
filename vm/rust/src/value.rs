@@ -11,8 +11,7 @@ use core::fmt::{self, Display, Formatter};
 pub struct Value(u64);
 
 /// A typed value.
-#[derive(Copy, Clone, Debug, PartialEq)]
-#[cfg_attr(not(feature = "float"), derive(Eq))]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum TypedValue {
     Cons(Cons),
     Number(Number),
@@ -145,7 +144,7 @@ impl Display for Value {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Type, cons::NEVER};
+    use crate::cons::NEVER;
 
     #[test]
     fn convert_cons() {
@@ -182,7 +181,6 @@ mod tests {
         let tag = Value::from(Number::from_i64(42)).tag();
 
         assert_eq!(tag, Default::default());
-        assert_eq!(tag, Type::default() as Tag);
     }
 
     #[test]
