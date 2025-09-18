@@ -24,13 +24,15 @@ pub trait Integer:
     + Display
 {
     const BITS: u32;
+    const MASK: Self;
 }
 
 macro_rules! impl_integer {
-    ($($t:ty),*) => {
+    ($($type:ty),*) => {
         $(
-            impl Integer for $t {
+            impl Integer for $type {
                 const BITS: u32 = Self::BITS;
+                const MASK: Self = Self::MAX;
             }
         )*
     };
