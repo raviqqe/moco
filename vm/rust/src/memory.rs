@@ -1,6 +1,7 @@
 use crate::{heap::Heap, value::Value};
 
-const CONS_FIELD_COUNT: usize = 2;
+// TODO
+// const CONS_FIELD_COUNT: usize = 2;
 
 /// A memory on a virtual machine.
 pub struct Memory<V: Value, H: Heap<V>> {
