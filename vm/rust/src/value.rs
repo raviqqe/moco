@@ -35,16 +35,21 @@ pub trait Value {
         + Debug
         + Display;
 
-    /// Boxes a cons.
-    fn box_cons(cons: Self) -> Self;
+    /// Converts a cons to a value.
+    fn from_cons(cons: Self) -> Self;
 
-    /// Boxes a cons.
-    fn unbox_cons(cons: Self) -> Self;
+    /// Converts a value to a cons.
+    fn to_cons(cons: Self) -> Self;
+
+    /// Checks if a value is a cons.
     fn is_cons(value: Self) -> bool;
+
+    /// Converts a number to a value.
     fn from_number(number: Self::Number) -> Self;
+
+    /// Converts a value to a number.
     fn to_number(number: Self::Number) -> Self;
-    fn from_i64(number: i64) -> Self::Number;
-    fn to_i64(number: Self::Number) -> i64;
+
     fn from_raw(raw: Self) -> Self::Number;
     fn to_raw(number: Self::Number) -> Self;
 }
@@ -54,12 +59,12 @@ impl Value for i64 {
     type Tag = u16;
 
     #[inline]
-    fn box_cons(cons: Self) -> Self {
+    fn from_cons(cons: Self) -> Self {
         cons << 1
     }
 
     #[inline]
-    fn unbox_cons(cons: Self) -> Self {
+    fn to_cons(cons: Self) -> Self {
         cons >> 1
     }
 
