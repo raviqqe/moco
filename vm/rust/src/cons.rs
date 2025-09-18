@@ -13,7 +13,7 @@ pub struct Cons<V: Value> {
 
 impl<V: Value> Cons<V> {
     /// Creates a cons.
-    fn new(car: V, cdr: V, tag: Tag) -> Self {
+    pub const fn new(car: V, cdr: V, tag: Tag) -> Self {
         Self {
             car,
             cdr,
@@ -23,22 +23,22 @@ impl<V: Value> Cons<V> {
     }
 
     /// Returns `car`.
-    fn car(self) -> V {
+    pub const fn car(self) -> V {
         self.car
     }
 
     /// Returns `cdr`.
-    fn cdr(self) -> V {
+    pub const fn cdr(self) -> V {
         self.cdr
     }
 
     /// Returns a tag.
-    fn tag(self) -> Tag {
+    pub const fn tag(self) -> Tag {
         self.tag
     }
 
     /// Returns a mark.
-    fn mark(self) -> u8 {
+    pub const fn mark(self) -> u8 {
         self.mark
     }
 }
