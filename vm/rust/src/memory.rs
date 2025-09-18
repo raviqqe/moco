@@ -1,44 +1,7 @@
-use crate::{
-    Error,
-    cons::{Cons, NEVER, Tag},
-    number::Number,
-    r#type::Type,
-    value::Value,
-};
-use core::fmt::{self, Display, Formatter, Write};
+use crate::{error::Error, value::Value};
+use core::fmt::{self, Write};
 
 const CONS_FIELD_COUNT: usize = 2;
-
-macro_rules! assert_heap_index {
-    ($self:expr, $index:expr, $garbage:expr) => {
-        let (start, end) = if $garbage {
-            let start = if $self.space { 0 } else { $self.space_size() };
-
-            (start, start + $self.space_size())
-        } else {
-            ($self.allocation_start(), $self.allocation_end())
-        };
-
-        debug_assert!(start <= $index);
-        debug_assert!($index < end);
-    };
-}
-
-macro_rules! assert_heap_cons {
-    ($self:expr, $cons:expr) => {
-        if $cons != NEVER {
-            assert_heap_index!($self, $cons.index(), false);
-        }
-    };
-}
-
-macro_rules! assert_heap_value {
-    ($self:expr, $cons:expr) => {
-        if let Some(cons) = $cons.to_cons() {
-            assert_heap_cons!($self, cons);
-        }
-    };
-}
 
 /// A memory on a virtual machine.
 pub struct Memory<'a> {
@@ -515,39 +478,5 @@ impl Write for Memory<'_> {
             Ok(())
         })()
         .map_err(|_| fmt::Error)
-    }
-}
-
-impl Display for Memory<'_> {
-    fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
-        writeln!(formatter, "code: {}", self.code)?;
-        writeln!(formatter, "stack: {}", self.stack)?;
-
-        for index in 0..self.allocation_index / 2 {
-            let index = self.allocation_start() + 2 * index;
-            let cons = Cons::new(index as u64);
-
-            write!(
-                formatter,
-                "{:02x}: {} {}",
-                index,
-                self.car(cons).map_err(|_| fmt::Error)?,
-                self.cdr(cons).map_err(|_| fmt::Error)?
-            )?;
-
-            for (cons, name) in [
-                (self.code, "code"),
-                (self.register, "register"),
-                (self.stack, "stack"),
-            ] {
-                if index == cons.index() && cons != NEVER {
-                    write!(formatter, " <- {name}")?;
-                }
-            }
-
-            writeln!(formatter)?;
-        }
-
-        Ok(())
     }
 }
