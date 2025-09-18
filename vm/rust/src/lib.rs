@@ -17,4 +17,4 @@ pub use error::Error;
 pub use heap::Heap;
 pub use integer::Integer;
 pub use memory::Memory;
-pub use value::{Value, Value32, Value64};
+pub use value::{Value, Value16, Value32, Value64};

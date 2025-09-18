@@ -2,33 +2,13 @@ use crate::cons::Cons;
 use crate::error::Error;
 use crate::{heap::Heap, value::Value};
 
-macro_rules! assert_heap_index {
-    ($self:expr, $index:expr) => {
-        debug_assert!($index < $self.heap.as_ref().len());
-    };
-}
-
-macro_rules! assert_heap_cons {
-    ($self:expr, $cons:expr, $value:ty) => {
-        assert_heap_index!($self, $cons.index());
-    };
-}
-
-macro_rules! assert_heap_value {
-    ($self:expr, $cons:expr, $value:ty) => {
-        if $cons.is_cons() {
-            assert_heap_cons!($self, $cons.to_cons(), $value);
-        }
-    };
-}
-
 /// A memory on a virtual machine.
-pub struct Memory<V: Value, H: Heap<V>> {
-    root: V::Cons,
+pub struct Memory<V: Value, H: Heap<Cons<V>>> {
+    root: V::Pointer,
     heap: H,
 }
 
-impl<V: Value, H: Heap<V>> Memory<V, H> {
+impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
     /// Creates a memory.
     pub fn new(heap: H) -> Self {
         Self {
@@ -39,21 +19,19 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
     /// Returns a root.
     #[inline]
-    pub const fn root(&self) -> V::Cons {
+    pub const fn root(&self) -> V::Pointer {
         self.root
     }
 
     /// Sets a root.
     #[inline]
-    pub const fn set_root(&mut self, cons: V::Cons) {
-        self.root = cons;
+    pub const fn set_root(&mut self, pointer: V::Pointer) {
+        self.root = pointer;
     }
 
     /// Returns a value at an index.
     #[inline]
-    pub fn get(&self, index: usize) -> Result<V, Error> {
-        assert_heap_index!(self, index);
-
+    pub fn get(&self, index: usize) -> Result<Cons<V>, Error> {
         self.heap
             .as_ref()
             .get(index)
@@ -63,27 +41,20 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
     /// Sets a value at an index.
     #[inline]
-    pub fn set(&mut self, index: usize, value: V) -> Result<(), Error> {
-        assert_heap_index!(self, index);
-
+    pub fn set(&mut self, index: usize, cons: Cons<V>) -> Result<(), Error> {
         *self
             .heap
             .as_mut()
             .get_mut(index)
-            .ok_or(Error::InvalidMemoryAccess)? = value;
+            .ok_or(Error::InvalidMemoryAccess)? = cons;
 
         Ok(())
     }
 
     /// Allocates a cons.
     #[inline]
-    pub fn allocate(&mut self, car: V, cdr: V) -> Result<V::Cons, Error> {
+    pub fn allocate(&mut self, car: V, cdr: V) -> Result<V::Pointer, Error> {
         let mut cons = self.allocate_unchecked(car, cdr)?;
-
-        debug_assert_eq!(cons.tag(), Default::default());
-        assert_heap_cons!(self, cons, V);
-        assert_heap_value!(self, car, V);
-        assert_heap_value!(self, cdr, V);
 
         if self.is_out_of_memory() || cfg!(feature = "gc_always") {
             self.collect_garbages(Some(&mut cons))?;
@@ -94,7 +65,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
     // TODO
     #[expect(clippy::unused_self)]
-    fn allocate_unchecked(&mut self, _car: V, _cdr: V) -> Result<V::Cons, Error> {
+    fn allocate_unchecked(&mut self, _car: V, _cdr: V) -> Result<V::Pointer, Error> {
         Ok(Default::default())
     }
 
@@ -106,7 +77,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
     // TODO
     #[expect(clippy::unused_self)]
-    const fn collect_garbages(&mut self, _cons: Option<&mut V::Cons>) -> Result<(), Error> {
+    const fn collect_garbages(&mut self, _cons: Option<&mut V::Pointer>) -> Result<(), Error> {
         Ok(())
     }
 }
