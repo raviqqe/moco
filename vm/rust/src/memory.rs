@@ -10,9 +10,7 @@ macro_rules! assert_heap_index {
 
 macro_rules! assert_heap_cons {
     ($self:expr, $cons:expr, $value:ty) => {
-        if $cons != <$value as Value>::Cons::default() {
-            assert_heap_index!($self, $cons.index());
-        }
+        assert_heap_index!($self, $cons.index());
     };
 }
 
