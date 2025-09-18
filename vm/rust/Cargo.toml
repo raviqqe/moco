@@ -13,6 +13,7 @@ categories = ["no-std", "no-std::no-alloc", "wasm"]
 
 [features]
 alloc = []
+gc_always = []
 
 [lints.clippy]
 alloc_instead_of_core = "deny"

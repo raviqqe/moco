@@ -24,20 +24,30 @@ pub trait Integer:
     + Display
 {
     /// A size in bits.
-    const BITS: u32;
+    const BITS: usize;
+
     /// A mask.
     const MASK: Self;
 }
 
 macro_rules! impl_integer {
-    ($($type:ty),*) => {
-        $(
-            impl Integer for $type {
-                const BITS: u32 = Self::BITS;
-                const MASK: Self = Self::MAX;
-            }
-        )*
+    ($type:ty) => {
+        impl Integer for $type {
+            const BITS: usize = Self::BITS as _;
+            const MASK: Self = Self::MAX;
+        }
     };
 }
 
-impl_integer!(i8, i16, i32, i64, i128, u8, u16, u32, u64, u128);
+impl_integer!(i8);
+impl_integer!(i16);
+impl_integer!(i32);
+impl_integer!(i64);
+impl_integer!(i128);
+impl_integer!(isize);
+impl_integer!(u8);
+impl_integer!(u16);
+impl_integer!(u32);
+impl_integer!(u64);
+impl_integer!(u128);
+impl_integer!(usize);
