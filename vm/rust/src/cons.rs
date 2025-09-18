@@ -38,22 +38,27 @@ macro_rules! impl_cons {
             type Raw = $raw;
             type Tag = $tag;
 
+            #[inline]
             fn new(index: usize) -> Self {
                 Self((index as Self::Raw) << (Self::Tag::BITS + 1))
             }
 
+            #[inline]
             fn index(self) -> usize {
                 (self.0 >> (Self::Tag::BITS + 1)) as _
             }
 
+            #[inline]
             fn tag(self) -> Self::Tag {
                 (self.0 >> 1) as Self::Tag & Self::Tag::MASK
             }
 
+            #[inline]
             fn to_raw(self) -> Self::Raw {
                 self.0
             }
 
+            #[inline]
             fn from_raw(raw: Self::Raw) -> Self {
                 Self(raw)
             }
