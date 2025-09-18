@@ -1,4 +1,5 @@
 pub type InnerNumber = i32;
+pub type InnerValue = u32;
 
 #[inline]
 pub const fn box_cons(cons: u32) -> u32 {
