@@ -1,7 +1,4 @@
-use crate::{
-    Cons, Integer,
-    cons::{Cons32, Cons64},
-};
+use crate::{Cons, Integer};
 use core::fmt::Debug;
 
 /// A value.
@@ -15,10 +12,10 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     type Number: Integer;
 
     /// Converts a cons to a value.
-    fn from_cons(cons: Self::Cons) -> Self;
+    fn from_pointer(cons: Self::Cons) -> Self;
 
     /// Converts a value to a cons.
-    fn to_cons(self) -> Self::Cons;
+    fn to_pointer(self) -> Self::Cons;
 
     /// Checks if a value is a cons.
     fn is_cons(self) -> bool;
@@ -39,9 +36,9 @@ pub struct Value32(u32);
 pub struct Value64(u64);
 
 macro_rules! impl_value {
-    ($value:ty, $cons:ty, $number:ty) => {
+    ($value:ty, $number:ty, $pointer:ty) => {
         impl Value for $value {
-            type Cons = $cons;
+            type Pointer = $pointer;
             type Number = $number;
 
             #[inline]
@@ -72,8 +69,8 @@ macro_rules! impl_value {
     };
 }
 
-impl_value!(Value32, Cons32, i32);
-impl_value!(Value64, Cons64, i64);
+impl_value!(Value32, i32, u32);
+impl_value!(Value64, i64, u64);
 
 #[cfg(test)]
 mod tests {
