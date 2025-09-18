@@ -19,10 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: raviqqe/cargo-cache@v1
-      - run: cargo build --features ${{ matrix.features }}
+      - run: echo BUILD_OPTIONS="--features ${{ matrix.features }}" >> ${{ github.env }}
+      - run: cargo build $BUILD_OPTIONS
       - run: cargo fmt -- --check
-      - run: cargo clippy -- -D warnings --features ${{ matrix.features }}
-      - run: cargo test --features ${{ matrix.features }}
+      - run: cargo clippy  $BUILD_OPTIONS -- -D warnings
+      - run: cargo test  $BUILD_OPTIONS
   test:
     needs:
       - rust
