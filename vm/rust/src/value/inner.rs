@@ -1,56 +1,49 @@
-pub type InnerNumber = i64;
+use cfg_elif::item_feature;
 
-#[inline]
-pub const fn box_cons(cons: u64) -> u64 {
-    cons << 1
-}
+item_feature!(if ("i32") {
+    mod i32;
+} else {
+    mod i64;
+});
 
-#[inline]
-pub const fn unbox_cons(cons: u64) -> u64 {
-    cons >> 1
-}
+item_feature!(if ("i32") {
+    pub use self::i32::*;
+} else {
+    pub use self::i64::*;
+});
 
-#[inline]
-pub const fn is_cons(value: u64) -> bool {
-    value & 1 == 0
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-#[inline]
-pub const fn from_number(number: InnerNumber) -> InnerNumber {
-    (number << 1) | 1
-}
+    #[test]
+    fn box_unbox_cons() {
+        assert_eq!(unbox_cons(box_cons(0)), 0);
+        assert_eq!(unbox_cons(box_cons(1)), 1);
+        assert_eq!(unbox_cons(box_cons(42)), 42);
+    }
 
-#[inline]
-pub const fn to_number(number: InnerNumber) -> InnerNumber {
-    number >> 1
-}
+    #[test]
+    fn check_cons() {
+        assert!(is_cons(box_cons(0)));
+        assert!(!is_cons(to_raw(from_number(0))));
+    }
 
-#[inline]
-pub const fn from_i64(number: i64) -> InnerNumber {
-    from_number(number)
-}
+    #[test]
+    fn convert_number() {
+        assert_eq!(to_number(from_number(-42)), -42);
+        assert_eq!(to_number(from_number(-1)), -1);
+        assert_eq!(to_number(from_number(0)), 0);
+        assert_eq!(to_number(from_number(1)), 1);
+        assert_eq!(to_number(from_number(42)), 42);
+    }
 
-#[inline]
-pub const fn to_i64(number: InnerNumber) -> i64 {
-    to_number(number)
-}
-
-#[inline]
-pub const fn from_f64(number: f64) -> InnerNumber {
-    from_number(number as _)
-}
-
-#[inline]
-pub const fn to_f64(number: InnerNumber) -> f64 {
-    to_number(number) as _
-}
-
-#[inline]
-pub const fn from_raw(raw: u64) -> InnerNumber {
-    raw as _
-}
-
-#[inline]
-pub const fn to_raw(number: InnerNumber) -> u64 {
-    number as _
+    #[test]
+    fn convert_i64() {
+        assert_eq!(to_i64(from_i64(-42)), -42);
+        assert_eq!(to_i64(from_i64(-1)), -1);
+        assert_eq!(to_i64(from_i64(0)), 0);
+        assert_eq!(to_i64(from_i64(1)), 1);
+        assert_eq!(to_i64(from_i64(42)), 42);
+    }
 }

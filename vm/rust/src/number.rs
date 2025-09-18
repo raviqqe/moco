@@ -35,18 +35,6 @@ impl Number {
         inner::to_i64(self.0)
     }
 
-    /// Converts `f64` to a number.
-    #[inline]
-    pub const fn from_f64(number: f64) -> Self {
-        Self(inner::from_f64(number))
-    }
-
-    /// Converts a number to `f64`.
-    #[inline]
-    pub const fn to_f64(self) -> f64 {
-        inner::to_f64(self.0)
-    }
-
     #[inline]
     pub(crate) const fn from_raw(raw: u64) -> Self {
         Self(inner::from_raw(raw))

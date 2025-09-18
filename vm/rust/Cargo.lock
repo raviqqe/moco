@@ -3,5 +3,14 @@
 version = 4
 
 [[package]]
+name = "cfg-elif"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "48e4c88374f9089549688b990b079b53e13178ba952757332da543601c8f2313"
+
+[[package]]
 name = "moco-vm"
 version = "0.1.1"
+dependencies = [
+ "cfg-elif",
+]
