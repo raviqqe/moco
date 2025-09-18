@@ -1,9 +1,9 @@
 /// A heap memory.
-pub trait Heap: AsRef<[Value]> + AsMut<[Value]> {}
+pub trait Heap<T>: AsRef<[T]> + AsMut<[T]> {}
 
-impl Heap for &mut [Value] {}
+impl<T> Heap<T> for &mut [T] {}
 
-impl<const N: usize> Heap for [Value; N] {}
+impl<T, const N: usize> Heap<T> for [T; N] {}
 
 #[cfg(feature = "alloc")]
-impl Heap for alloc::vec::Vec<Value> {}
+impl Heap<T> for alloc::vec::Vec<T> {}
