@@ -4,27 +4,25 @@ use core::fmt::Debug;
 /// A value.
 pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     /// A cons.
-    ///
-    /// Note that its internal representation must be compatible with values.
-    type Cons: Cons;
+    type Pointer: Integer;
 
     /// A number.
     type Number: Integer;
-
-    /// Converts a cons to a value.
-    fn from_pointer(cons: Self::Cons) -> Self;
-
-    /// Converts a value to a cons.
-    fn to_pointer(self) -> Self::Cons;
-
-    /// Checks if a value is a cons.
-    fn is_cons(self) -> bool;
 
     /// Converts a number to a value.
     fn from_number(number: Self::Number) -> Self;
 
     /// Converts a value to a number.
     fn to_number(self) -> Self::Number;
+
+    /// Converts a pointer to a value.
+    fn from_pointer(cons: Self::Pointer) -> Self;
+
+    /// Converts a value to a pointer.
+    fn to_pointer(self) -> Self::Pointer;
+
+    /// Checks if a value is a pointer.
+    fn is_pointer(self) -> bool;
 }
 
 /// A 32-bit value.
