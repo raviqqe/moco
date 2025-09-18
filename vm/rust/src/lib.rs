@@ -9,5 +9,6 @@ mod heap;
 mod integer;
 mod value;
 
+pub use heap::Heap;
 pub use integer::Integer;
 pub use value::{Value, Value32, Value64};
