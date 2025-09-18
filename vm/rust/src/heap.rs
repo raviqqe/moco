@@ -6,4 +6,4 @@ impl<T> Heap<T> for &mut [T] {}
 impl<T, const N: usize> Heap<T> for [T; N] {}
 
 #[cfg(feature = "alloc")]
-impl Heap<T> for alloc::vec::Vec<T> {}
+impl<T> Heap<T> for alloc::vec::Vec<T> {}
