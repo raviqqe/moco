@@ -1,5 +1,3 @@
-mod i64;
-
 use core::{
     fmt::{Debug, Display},
     ops::{Add, Div, Mul, Sub},
@@ -34,3 +32,5 @@ pub trait Value {
         + Debug
         + Display;
 }
+
+impl Value for i64 {}
