@@ -92,18 +92,21 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         Ok(cons)
     }
 
+    // TODO
+    #[expect(clippy::unused_self)]
     fn allocate_unchecked(&mut self, _car: V, _cdr: V) -> Result<V::Cons, Error> {
-        // TODO
-        Ok(V::Cons::default())
+        Ok(Default::default())
     }
 
     // TODO
-    fn is_out_of_memory(&self) -> bool {
+    #[expect(clippy::unused_self)]
+    const fn is_out_of_memory(&self) -> bool {
         false
     }
 
     // TODO
-    fn collect_garbages(&mut self, _cons: Option<&mut V::Cons>) -> Result<(), Error> {
+    #[expect(clippy::unused_self)]
+    const fn collect_garbages(&mut self, _cons: Option<&mut V::Cons>) -> Result<(), Error> {
         Ok(())
     }
 }
