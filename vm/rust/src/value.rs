@@ -83,7 +83,7 @@ mod tests {
                 use super::*;
 
                 fn cons(index: <<$value as Value>::Cons as Cons>::Raw) -> <$value as Value>::Cons {
-                    <$value as Value>::Cons::new(index)
+                    <$value as Value>::Cons::new(index as _)
                 }
 
                 fn from_cons(cons: <$value as Value>::Cons) -> $value {

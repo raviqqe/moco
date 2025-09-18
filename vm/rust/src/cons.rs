@@ -9,10 +9,10 @@ pub trait Cons: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     type Tag: Integer;
 
     /// Creates a cons.
-    fn new(index: Self::Raw) -> Self;
+    fn new(index: usize) -> Self;
 
     /// Returns a memory index.
-    fn index(self) -> Self::Raw;
+    fn index(self) -> usize;
 
     /// Returns a tag.
     fn tag(self) -> Self::Tag;
@@ -38,12 +38,12 @@ macro_rules! impl_cons {
             type Raw = $raw;
             type Tag = $tag;
 
-            fn new(index: Self::Raw) -> Self {
-                Self(index << (Self::Tag::BITS + 1))
+            fn new(index: usize) -> Self {
+                Self((index as Self::Raw) << (Self::Tag::BITS + 1))
             }
 
-            fn index(self) -> Self::Raw {
-                self.0 >> (Self::Tag::BITS + 1)
+            fn index(self) -> usize {
+                (self.0 >> (Self::Tag::BITS + 1)) as _
             }
 
             fn tag(self) -> Self::Tag {
