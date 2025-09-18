@@ -4,7 +4,20 @@ use core::{
 };
 
 /// A value.
-pub trait Value {
+pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
+    /// A cons.
+    type Cons: Add
+        + Sub
+        + PartialEq
+        + Eq
+        + PartialOrd
+        + Ord
+        + Clone
+        + Copy
+        + Default
+        + Debug
+        + Display;
+
     /// A number.
     type Number: Add
         + Sub
@@ -36,10 +49,10 @@ pub trait Value {
         + Display;
 
     /// Converts a cons to a value.
-    fn from_cons(cons: Self) -> Self;
+    fn from_cons(cons: Self::Cons) -> Self;
 
     /// Converts a value to a cons.
-    fn to_cons(cons: Self) -> Self;
+    fn to_cons(cons: Self) -> Self::Cons;
 
     /// Checks if a value is a cons.
     fn is_cons(value: Self) -> bool;
@@ -49,12 +62,12 @@ pub trait Value {
 
     /// Converts a value to a number.
     fn to_number(number: Self::Number) -> Self;
-
-    fn from_raw(raw: Self) -> Self::Number;
-    fn to_raw(number: Self::Number) -> Self;
 }
 
-impl Value for i64 {
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
+struct I64Value(u64);
+
+impl Value for I64Value {
     type Number = i64;
     type Tag = u16;
 
@@ -81,25 +94,5 @@ impl Value for i64 {
     #[inline]
     fn to_number(number: Self::Number) -> Self {
         number >> 1
-    }
-
-    #[inline]
-    fn from_i64(number: i64) -> Self::Number {
-        from_number(number)
-    }
-
-    #[inline]
-    fn to_i64(number: Self::Number) -> i64 {
-        to_number(number)
-    }
-
-    #[inline]
-    fn from_raw(raw: Self) -> Self::Number {
-        raw as _
-    }
-
-    #[inline]
-    fn to_raw(number: Self::Number) -> Self {
-        number as _
     }
 }
