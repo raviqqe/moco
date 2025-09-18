@@ -1,7 +1,7 @@
 use crate::{
     Error,
     value::Value,
-    value::inner::{self, NumberInner},
+    value::inner::{self, InnerNumber},
 };
 use core::{
     fmt::{self, Display, Formatter},
@@ -10,16 +10,16 @@ use core::{
 
 /// A number.
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub struct Number(NumberInner);
+pub struct Number(InnerNumber);
 
 impl Number {
     #[inline]
-    const fn new(number: NumberInner) -> Self {
+    const fn new(number: InnerNumber) -> Self {
         Self(inner::from_number(number))
     }
 
     #[inline]
-    const fn to_representation(self) -> NumberInner {
+    const fn to_representation(self) -> InnerNumber {
         inner::to_number(self.0)
     }
 
