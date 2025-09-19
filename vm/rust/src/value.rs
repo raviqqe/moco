@@ -24,6 +24,12 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     /// Checks if a value is a pointer.
     fn is_pointer(self) -> bool;
 
+    /// Marks a value.
+    fn mark(self, mark: bool) -> Self;
+
+    /// Returns `true` if a value is marked.
+    fn is_marked(self) -> bool;
+
     /// Converts a value to a cons.
     fn to_cons(self) -> Cons<Self> {
         Cons::new(self)
@@ -76,6 +82,11 @@ macro_rules! impl_value {
             #[inline]
             fn is_pointer(self) -> bool {
                 self.0 & 1 == 0
+            }
+
+            #[inline]
+            fn is_marked(self) -> bool {
+                self.0 & 0b10 != 0
             }
         }
     };
@@ -136,6 +147,7 @@ mod tests {
         };
     }
 
+    test_value!(value16, Value16);
     test_value!(value32, Value32);
     test_value!(value64, Value64);
 }
