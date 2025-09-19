@@ -25,9 +25,19 @@ impl<V: Value, T: Integer> Cons<V, T> {
         self.car
     }
 
+    /// Sets `car`.
+    pub const fn set_car(&mut self, value: V) {
+        self.car = value
+    }
+
     /// Returns `cdr`.
     pub const fn cdr(self) -> V {
         self.cdr
+    }
+
+    /// Sets `cdr`.
+    pub const fn set_cdr(&mut self, value: V) {
+        self.cdr = value
     }
 
     /// Returns a tag.
