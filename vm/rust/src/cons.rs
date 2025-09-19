@@ -18,12 +18,12 @@ impl<V: Value> Cons<V> {
     }
 
     /// Creates a cons pointer.
-    pub fn new(value: V) -> Self {
+    pub const fn new(value: V) -> Self {
         Self(value)
     }
 
     /// Converts a cons pointer to a value.
-    pub fn to_value(self) -> V {
+    pub const fn to_value(self) -> V {
         self.0
     }
 }

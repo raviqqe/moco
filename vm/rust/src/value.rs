@@ -55,22 +55,22 @@ macro_rules! impl_value {
 
             #[inline]
             fn from_number(number: Self::Number) -> Self {
-                Self(((number << 1) | 1) as _)
+                Self(((number << 2) | 1) as _)
             }
 
             #[inline]
             fn to_number(self) -> Self::Number {
-                self.0 as Self::Number >> 1
+                self.0 as Self::Number >> 2
             }
 
             #[inline]
             fn from_pointer(pointer: Self::Pointer) -> Self {
-                Self(pointer << 1)
+                Self(pointer << 2)
             }
 
             #[inline]
             fn to_pointer(self) -> Self::Pointer {
-                self.0 >> 1
+                self.0 >> 2
             }
 
             #[inline]
