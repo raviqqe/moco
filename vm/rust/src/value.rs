@@ -85,6 +85,11 @@ macro_rules! impl_value {
             }
 
             #[inline]
+            fn mark(self, mark: bool) -> Self {
+                Self(if mark { self.0 | 0b10 } else { self.0 & !0b10 })
+            }
+
+            #[inline]
             fn is_marked(self) -> bool {
                 self.0 & 0b10 != 0
             }
@@ -142,6 +147,23 @@ mod tests {
                 fn check_pointer() {
                     assert!(from_pointer(0).is_pointer());
                     assert!(!from_number(0).is_pointer());
+                }
+
+                #[test]
+                fn is_marked() {
+                    assert!(!from_pointer(0).is_marked());
+                    assert!(!from_number(0).is_marked());
+                }
+
+                #[test]
+                fn mark() {
+                    assert!(!from_pointer(0).mark(false).is_marked());
+                    assert!(from_pointer(0).mark(true).is_marked());
+                    assert_eq!(from_pointer(42).mark(true).to_pointer(), 42);
+
+                    assert!(!from_number(0).mark(false).is_marked());
+                    assert!(from_number(0).mark(true).is_marked());
+                    assert_eq!(from_number(42).mark(true).to_pointer(), 42);
                 }
             }
         };
