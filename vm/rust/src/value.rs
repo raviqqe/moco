@@ -159,11 +159,19 @@ mod tests {
                 fn mark() {
                     assert!(!from_pointer(0).mark(false).is_marked());
                     assert!(from_pointer(0).mark(true).is_marked());
+                    assert_eq!(from_pointer(0).mark(false).to_pointer(), 0);
+                    assert_eq!(from_pointer(42).mark(false).to_pointer(), 42);
+                    assert_eq!(from_pointer(0).mark(true).to_pointer(), 0);
                     assert_eq!(from_pointer(42).mark(true).to_pointer(), 42);
 
                     assert!(!from_number(0).mark(false).is_marked());
                     assert!(from_number(0).mark(true).is_marked());
-                    assert_eq!(from_number(42).mark(true).to_pointer(), 42);
+                    assert_eq!(from_number(0).mark(false).to_number(), 0);
+                    assert_eq!(from_number(42).mark(false).to_number(), 42);
+                    assert_eq!(from_number(-42).mark(false).to_number(), -42);
+                    assert_eq!(from_number(0).mark(true).to_number(), 0);
+                    assert_eq!(from_number(42).mark(true).to_number(), 42);
+                    assert_eq!(from_number(-42).mark(true).to_number(), -42);
                 }
             }
         };
