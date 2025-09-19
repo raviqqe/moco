@@ -84,17 +84,18 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
     }
 
     const fn mark(&mut self) -> Result<(), Error> {
-        let mut current = self.root;
+        let mut current = Some(self.root);
         let mut prev = None;
 
         loop {
-            // while current != null && current->markBit == 0 do
-            // current->markBit = 1;
-            // if current refers to a non-atomic object then
-            // next= current->left; current->left= prev;
-            // prev= current; current= next;
-            // // end of while current
-            // // retreat
+            while let Some(current)=  current && current->markBit == 0 {
+             self.get_mut(current).mark() = 1;
+             if current refers to a non-atomic object then
+             next= current->left; current->left= prev;
+             prev= current; current= next;
+            }
+
+            // retreat
             // while prev != null && prev->flagBit == 1 do
             // prev->flagBit= 0; next= prev->right;
             // prev->right= current; current= prev;
@@ -102,7 +103,7 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
             // // end of while previous
             // if prev == null then
             // return;
-            // // switch to right subgraph
+            // switch to right subgraph
             // prev->flagBit= 1;
             // next= prev->left;
             // prev->left= current;
