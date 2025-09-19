@@ -4,7 +4,7 @@ use crate::{heap::Heap, value::Value};
 
 /// A memory on a virtual machine.
 pub struct Memory<V: Value, H: Heap<Cons<V>>> {
-    root: V::Pointer,
+    root: V,
     heap: H,
 }
 
@@ -19,13 +19,13 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
 
     /// Returns a root.
     #[inline]
-    pub const fn root(&self) -> V::Pointer {
+    pub const fn root(&self) -> V {
         self.root
     }
 
     /// Sets a root.
     #[inline]
-    pub const fn set_root(&mut self, pointer: V::Pointer) {
+    pub const fn set_root(&mut self, pointer: V) {
         self.root = pointer;
     }
 
@@ -62,7 +62,7 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
     /// Allocates a cons.
     #[inline]
     pub fn allocate(&mut self, car: V, cdr: V) -> Result<V::Pointer, Error> {
-        let mut cons = self.allocate_unchecked(car, cdr)?;
+        let cons = self.allocate_unchecked(car, cdr)?;
 
         if self.is_out_of_memory() || cfg!(feature = "gc_always") {
             self.collect_garbages()?;
@@ -93,7 +93,7 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
 
     const fn mark(&mut self) -> Result<(), Error> {
         let mut current = Some(self.root);
-        let mut prev = None;
+        let mut prev = V::default();
 
         loop {
             while if let Some(current) = current {
@@ -104,9 +104,9 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
                 self.get_mut(current)?.set_mark(1);
 
                 if current.is_cons() {
-                    next = current.left;
-                    current.left = prev;
-                    prev = current;
+                    let next = self.get(current)?.car();
+                    self.get_mut(current)?.set_cdr(prev);
+                    prev = Some(current);
                     current = next;
                 }
             }
