@@ -1,6 +1,6 @@
 use core::{
     fmt::{Debug, Display},
-    ops::{Add, BitAnd, BitOr, Div, Mul, Shl, Shr, Sub},
+    ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Shl, Shr, Sub},
 };
 
 /// An integer.
@@ -13,6 +13,7 @@ pub trait Integer:
     + Shr
     + BitAnd
     + BitOr
+    + BitXor
     + PartialEq
     + Eq
     + PartialOrd
