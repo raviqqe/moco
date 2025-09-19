@@ -1,14 +1,12 @@
-use crate::cons::Cons;
-use crate::error::Error;
-use crate::{heap::Heap, value::Value};
+use crate::{error::Error, heap::Heap, value::Value};
 
 /// A memory on a virtual machine.
-pub struct Memory<V: Value, H: Heap<Cons<V>>> {
+pub struct Memory<V: Value, H: Heap<V>> {
     root: V::Pointer,
     heap: H,
 }
 
-impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
+impl<V: Value, H: Heap<V>> Memory<V, H> {
     /// Creates a memory.
     pub fn new(heap: H) -> Self {
         Self {
@@ -31,7 +29,7 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
 
     /// Returns a value at an index.
     #[inline]
-    pub fn get(&self, index: usize) -> Result<Cons<V>, Error> {
+    pub fn get(&self, index: usize) -> Result<V, Error> {
         self.heap
             .as_ref()
             .get(index)
@@ -41,12 +39,12 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
 
     /// Sets a value at an index.
     #[inline]
-    pub fn set(&mut self, index: usize, cons: Cons<V>) -> Result<(), Error> {
+    pub fn set(&mut self, index: usize, value: V) -> Result<(), Error> {
         *self
             .heap
             .as_mut()
             .get_mut(index)
-            .ok_or(Error::InvalidMemoryAccess)? = cons;
+            .ok_or(Error::InvalidMemoryAccess)? = value;
 
         Ok(())
     }

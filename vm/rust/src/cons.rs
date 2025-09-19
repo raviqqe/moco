@@ -1,62 +1,29 @@
-use crate::{Integer, Value};
+use crate::{Value, integer::Integer};
 
-/// A cons.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Cons<V: Value, T: Integer = u8> {
-    car: V,
-    cdr: V,
-    tag: T,
-    mark: u8,
-}
+/// A tag.
+pub type Tag = u8;
 
-impl<V: Value, T: Integer> Cons<V, T> {
-    /// Creates a cons.
-    pub const fn new(car: V, cdr: V, tag: T) -> Self {
-        Self {
-            car,
-            cdr,
-            tag,
-            mark: 0,
-        }
-    }
+/// A cons pointer.
+pub struct Cons<V>(V);
 
-    /// Returns `car`.
-    pub const fn car(self) -> V {
-        self.car
-    }
-
-    /// Sets `car`.
-    pub const fn set_car(&mut self, value: V) {
-        self.car = value
-    }
-
-    /// Returns `cdr`.
-    pub const fn cdr(self) -> V {
-        self.cdr
-    }
-
-    /// Sets `cdr`.
-    pub const fn set_cdr(&mut self, value: V) {
-        self.cdr = value
+impl<V: Value> Cons<V> {
+    /// Returns an index.
+    pub fn index(self) -> usize {
+        self.0.to_pointer().to_usize() >> Tag::BITS as usize
     }
 
     /// Returns a tag.
-    pub const fn tag(self) -> T {
-        self.tag
+    pub fn tag(self) -> Tag {
+        self.0.to_pointer().to_usize() as _
     }
 
-    /// Sets a tag.
-    pub const fn set_tag(&mut self, tag: T) {
-        self.tag = tag
+    /// Creates a cons pointer.
+    pub const fn new(value: V) -> Self {
+        Self(value)
     }
 
-    /// Returns a mark.
-    pub const fn mark(self) -> u8 {
-        self.mark
-    }
-
-    /// Sets a mark.
-    pub const fn set_mark(&mut self, mark: u8) {
-        self.mark = mark
+    /// Converts a cons pointer to a value.
+    pub const fn to_value(self) -> V {
+        self.0
     }
 }

@@ -1,4 +1,4 @@
-use crate::Integer;
+use crate::{Integer, cons::Cons};
 use core::fmt::Debug;
 
 /// A value.
@@ -23,6 +23,22 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
 
     /// Checks if a value is a pointer.
     fn is_pointer(self) -> bool;
+
+    /// Marks a value.
+    fn mark(self, mark: bool) -> Self;
+
+    /// Returns `true` if a value is marked.
+    fn is_marked(self) -> bool;
+
+    /// Converts a value to a cons.
+    fn to_cons(self) -> Cons<Self> {
+        Cons::new(self)
+    }
+
+    /// Converts a value to a cons.
+    fn from_cons(cons: Cons<Self>) -> Self {
+        cons.to_value()
+    }
 }
 
 /// A 16-bit value.
@@ -45,27 +61,37 @@ macro_rules! impl_value {
 
             #[inline]
             fn from_number(number: Self::Number) -> Self {
-                Self(((number << 1) | 1) as _)
+                Self(((number << 2) | 1) as _)
             }
 
             #[inline]
             fn to_number(self) -> Self::Number {
-                self.0 as Self::Number >> 1
+                self.0 as Self::Number >> 2
             }
 
             #[inline]
             fn from_pointer(pointer: Self::Pointer) -> Self {
-                Self(pointer << 1)
+                Self(pointer << 2)
             }
 
             #[inline]
             fn to_pointer(self) -> Self::Pointer {
-                self.0 >> 1
+                self.0 >> 2
             }
 
             #[inline]
             fn is_pointer(self) -> bool {
                 self.0 & 1 == 0
+            }
+
+            #[inline]
+            fn mark(self, mark: bool) -> Self {
+                Self(if mark { self.0 | 0b10 } else { self.0 & !0b10 })
+            }
+
+            #[inline]
+            fn is_marked(self) -> bool {
+                self.0 & 0b10 != 0
             }
         }
     };
@@ -83,6 +109,7 @@ mod tests {
         ($name:ident, $value:ty) => {
             mod $name {
                 use super::*;
+                use core::mem::size_of;
 
                 fn from_number(number: <$value as Value>::Number) -> $value {
                     <$value as Value>::from_number(number)
@@ -90,6 +117,14 @@ mod tests {
 
                 fn from_pointer(pointer: <$value as Value>::Pointer) -> $value {
                     <$value as Value>::from_pointer(pointer)
+                }
+
+                #[test]
+                fn size() {
+                    assert_eq!(
+                        size_of::<<$value as Value>::Number>(),
+                        size_of::<<$value as Value>::Pointer>()
+                    );
                 }
 
                 #[test]
@@ -113,10 +148,40 @@ mod tests {
                     assert!(from_pointer(0).is_pointer());
                     assert!(!from_number(0).is_pointer());
                 }
+
+                #[test]
+                fn is_marked() {
+                    assert!(!from_pointer(0).is_marked());
+                    assert!(!from_number(0).is_marked());
+                }
+
+                #[test]
+                fn mark_number() {
+                    assert!(!from_number(0).mark(false).is_marked());
+                    assert!(from_number(0).mark(true).is_marked());
+                    assert_eq!(from_number(0).mark(false).to_number(), 0);
+                    assert_eq!(from_number(42).mark(false).to_number(), 42);
+                    assert_eq!(from_number(-42).mark(false).to_number(), -42);
+                    assert_eq!(from_number(0).mark(true).to_number(), 0);
+                    assert_eq!(from_number(42).mark(true).to_number(), 42);
+                    assert_eq!(from_number(-42).mark(true).to_number(), -42);
+                }
+
+                #[test]
+                fn mark_pointer() {
+                    assert!(!from_pointer(0).mark(false).is_marked());
+                    assert!(from_pointer(0).mark(true).is_marked());
+
+                    assert_eq!(from_pointer(0).mark(false).to_pointer(), 0);
+                    assert_eq!(from_pointer(42).mark(false).to_pointer(), 42);
+                    assert_eq!(from_pointer(0).mark(true).to_pointer(), 0);
+                    assert_eq!(from_pointer(42).mark(true).to_pointer(), 42);
+                }
             }
         };
     }
 
+    test_value!(value16, Value16);
     test_value!(value32, Value32);
     test_value!(value64, Value64);
 }
