@@ -93,6 +93,7 @@ mod tests {
         ($name:ident, $value:ty) => {
             mod $name {
                 use super::*;
+                use core::mem::size_of;
 
                 fn from_number(number: <$value as Value>::Number) -> $value {
                     <$value as Value>::from_number(number)
@@ -100,6 +101,14 @@ mod tests {
 
                 fn from_pointer(pointer: <$value as Value>::Pointer) -> $value {
                     <$value as Value>::from_pointer(pointer)
+                }
+
+                #[test]
+                fn size() {
+                    assert_eq!(
+                        size_of::<<$value as Value>::Number>(),
+                        size_of::<<$value as Value>::Pointer>()
+                    );
                 }
 
                 #[test]
