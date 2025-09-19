@@ -1,5 +1,4 @@
-use crate::error::Error;
-use crate::{heap::Heap, value::Value};
+use crate::{error::Error, heap::Heap, value::Value};
 
 /// A memory on a virtual machine.
 pub struct Memory<V: Value, H: Heap<V>> {

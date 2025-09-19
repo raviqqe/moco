@@ -1,4 +1,4 @@
-use crate::Integer;
+use crate::{Integer, cons::Cons};
 use core::fmt::Debug;
 
 /// A value.
@@ -23,6 +23,16 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
 
     /// Checks if a value is a pointer.
     fn is_pointer(self) -> bool;
+
+    /// Converts a value to a cons.
+    fn to_cons(self) -> Cons<Self> {
+        Cons::new(self)
+    }
+
+    /// Converts a value to a cons.
+    fn from_cons(cons: Cons<Self>) -> Self {
+        cons.to_value()
+    }
 }
 
 /// A 16-bit value.

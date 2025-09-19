@@ -1,9 +1,29 @@
-use crate::Value;
+use crate::{Value, integer::Integer};
 
-pub struct Cons<V: Value>(V);
+/// A tag.
+pub type Tag = u8;
 
-impl<V> Cons<V> {
-    pub fn new(value: Value) -> Self {
+/// A cons pointer.
+pub struct Cons<V>(V);
+
+impl<V: Value> Cons<V> {
+    /// Returns an index.
+    pub fn index(self) -> usize {
+        self.0.to_pointer().to_usize() >> Tag::BITS as usize
+    }
+
+    /// Returns a tag.
+    pub fn tag(self) -> Tag {
+        self.0.to_pointer().to_usize() as _
+    }
+
+    /// Creates a cons pointer.
+    pub fn new(value: V) -> Self {
         Self(value)
+    }
+
+    /// Converts a cons pointer to a value.
+    pub fn to_value(self) -> V {
+        self.0
     }
 }
