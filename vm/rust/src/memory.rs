@@ -88,11 +88,17 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
         let mut prev = None;
 
         loop {
-            while let Some(current)=  current && current->markBit == 0 {
-             self.get_mut(current).mark() = 1;
-             if current refers to a non-atomic object then
-             next= current->left; current->left= prev;
-             prev= current; current= next;
+            while current
+                .map(|current| self.get(current).mark() == 0)
+                .unwrap_or_default()
+            {
+                self.get_mut(current)?.set_mark(1);
+                if current.is_cons() {
+                    next = current.left;
+                    current.left = prev;
+                    prev = current;
+                    current = next;
+                }
             }
 
             // retreat
