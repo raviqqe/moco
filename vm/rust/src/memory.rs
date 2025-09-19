@@ -57,7 +57,7 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
         let mut cons = self.allocate_unchecked(car, cdr)?;
 
         if self.is_out_of_memory() || cfg!(feature = "gc_always") {
-            self.collect_garbages(Some(&mut cons))?;
+            self.collect_garbages()?;
         }
 
         Ok(cons)
@@ -77,7 +77,37 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
 
     // TODO
     #[expect(clippy::unused_self)]
-    const fn collect_garbages(&mut self, _cons: Option<&mut V::Pointer>) -> Result<(), Error> {
+    pub const fn collect_garbages(&mut self) -> Result<(), Error> {
+        self.mark();
+
+        Ok(())
+    }
+
+    const fn mark(&mut self) -> Result<(), Error> {
+        // current= R;
+        // prev= null;
+        // while true do
+        // // follow left pointers
+        // while current != null && current->markBit == 0 do
+        // current->markBit = 1;
+        // if current refers to a non-atomic object then
+        // next= current->left; current->left= prev;
+        // prev= current; current= next;
+        // // end of while current
+        // // retreat
+        // while prev != null && prev->flagBit == 1 do
+        // prev->flagBit= 0; next= prev->right;
+        // prev->right= current; current= prev;
+        // prev= next;
+        // // end of while previous
+        // if prev == null then
+        // return;
+        // // switch to right subgraph
+        // prev->flagBit= 1;
+        // next= prev->left;
+        // prev->left= current;
+        // current= prev->right;
+        // prev->right= next;
         Ok(())
     }
 }
