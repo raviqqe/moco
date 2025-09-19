@@ -31,11 +31,19 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
 
     /// Returns a value at an index.
     #[inline]
-    pub fn get(&self, index: usize) -> Result<Cons<V>, Error> {
+    pub fn get(&self, index: usize) -> Result<&Cons<V>, Error> {
         self.heap
             .as_ref()
             .get(index)
-            .copied()
+            .ok_or(Error::InvalidMemoryAccess)
+    }
+
+    /// Returns a value at an index.
+    #[inline]
+    pub fn get_mut(&mut self, index: usize) -> Result<&mut Cons<V>, Error> {
+        self.heap
+            .as_mut()
+            .get_mut(index)
             .ok_or(Error::InvalidMemoryAccess)
     }
 
@@ -93,6 +101,7 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
                 .unwrap_or_default()
             {
                 self.get_mut(current)?.set_mark(1);
+
                 if current.is_cons() {
                     next = current.left;
                     current.left = prev;
