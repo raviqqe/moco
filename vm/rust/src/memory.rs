@@ -78,36 +78,38 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
     // TODO
     #[expect(clippy::unused_self)]
     pub const fn collect_garbages(&mut self) -> Result<(), Error> {
-        self.mark();
+        self.mark()?;
 
         Ok(())
     }
 
     const fn mark(&mut self) -> Result<(), Error> {
-        // current= R;
-        // prev= null;
-        // while true do
-        // // follow left pointers
-        // while current != null && current->markBit == 0 do
-        // current->markBit = 1;
-        // if current refers to a non-atomic object then
-        // next= current->left; current->left= prev;
-        // prev= current; current= next;
-        // // end of while current
-        // // retreat
-        // while prev != null && prev->flagBit == 1 do
-        // prev->flagBit= 0; next= prev->right;
-        // prev->right= current; current= prev;
-        // prev= next;
-        // // end of while previous
-        // if prev == null then
-        // return;
-        // // switch to right subgraph
-        // prev->flagBit= 1;
-        // next= prev->left;
-        // prev->left= current;
-        // current= prev->right;
-        // prev->right= next;
+        let mut current = self.root;
+        let mut prev = None;
+
+        loop {
+            // while current != null && current->markBit == 0 do
+            // current->markBit = 1;
+            // if current refers to a non-atomic object then
+            // next= current->left; current->left= prev;
+            // prev= current; current= next;
+            // // end of while current
+            // // retreat
+            // while prev != null && prev->flagBit == 1 do
+            // prev->flagBit= 0; next= prev->right;
+            // prev->right= current; current= prev;
+            // prev= next;
+            // // end of while previous
+            // if prev == null then
+            // return;
+            // // switch to right subgraph
+            // prev->flagBit= 1;
+            // next= prev->left;
+            // prev->left= current;
+            // current= prev->right;
+            // prev->right= next;
+        }
+
         Ok(())
     }
 }
