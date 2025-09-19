@@ -1,10 +1,10 @@
 [package]
 name = "moco-vm"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2024"
 description = "The tiny virtual machine"
 readme = "../../README.md"
-repository = "https://github.com/raviqqe/moco-vm"
+repository = "https://github.com/raviqqe/moco"
 license = "Unlicense"
 keywords = ["interpreter", "language"]
 categories = ["no-std", "no-std::no-alloc", "wasm"]
