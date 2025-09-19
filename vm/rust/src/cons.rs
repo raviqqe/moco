@@ -1,19 +1,17 @@
-use crate::Value;
-
-type Tag = u8;
+use crate::{Integer, Value};
 
 /// A cons.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Cons<V: Value> {
+pub struct Cons<V: Value, T: Integer = u8> {
     car: V,
     cdr: V,
-    tag: Tag,
+    tag: T,
     mark: u8,
 }
 
-impl<V: Value> Cons<V> {
+impl<V: Value, T: Integer> Cons<V, T> {
     /// Creates a cons.
-    pub const fn new(car: V, cdr: V, tag: Tag) -> Self {
+    pub const fn new(car: V, cdr: V, tag: T) -> Self {
         Self {
             car,
             cdr,
@@ -33,7 +31,7 @@ impl<V: Value> Cons<V> {
     }
 
     /// Returns a tag.
-    pub const fn tag(self) -> Tag {
+    pub const fn tag(self) -> T {
         self.tag
     }
 
