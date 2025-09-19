@@ -85,7 +85,7 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
 
     // TODO
     #[expect(clippy::unused_self)]
-    pub const fn collect_garbages(&mut self) -> Result<(), Error> {
+    pub fn collect_garbages(&mut self) -> Result<(), Error> {
         self.mark()?;
 
         Ok(())
@@ -96,10 +96,11 @@ impl<V: Value, H: Heap<Cons<V>>> Memory<V, H> {
         let mut prev = None;
 
         loop {
-            while current
-                .map(|current| self.get(current).mark() == 0)
-                .unwrap_or_default()
-            {
+            while if let Some(current) = current {
+                self.get(current)?.mark() == 0
+            } else {
+                false
+            } {
                 self.get_mut(current)?.set_mark(1);
 
                 if current.is_cons() {
