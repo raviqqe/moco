@@ -10,7 +10,7 @@ impl<V: Value> Cons<V> {
     /// Creates a cons pointer.
     pub fn new(index: V::Pointer, tag: Tag) -> Self {
         Self(V::from_pointer(V::Pointer::from_usize(
-            ((index.to_usize() << Tag::BITS) | tag.to_usize()),
+            (index.to_usize() << Tag::BITS) | tag.to_usize(),
         )))
     }
 

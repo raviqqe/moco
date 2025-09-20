@@ -32,7 +32,7 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
 
     /// Converts a value to a cons.
     fn to_cons(self) -> Cons<Self> {
-        Cons::new(self)
+        Cons::from_value(self)
     }
 
     /// Converts a value to a cons.
