@@ -7,6 +7,13 @@ pub type Tag = u8;
 pub struct Cons<V>(V);
 
 impl<V: Value> Cons<V> {
+    /// Creates a cons pointer.
+    pub fn new(index: V::Pointer, tag: Tag) -> Self {
+        Self(V::from_pointer(V::Pointer::from_usize(
+            (index.to_usize() << Tag::BITS) | tag.to_usize(),
+        )))
+    }
+
     /// Returns an index.
     pub fn index(self) -> usize {
         self.0.to_pointer().to_usize() >> Tag::BITS as usize
@@ -17,8 +24,8 @@ impl<V: Value> Cons<V> {
         self.0.to_pointer().to_usize() as _
     }
 
-    /// Creates a cons pointer.
-    pub const fn new(value: V) -> Self {
+    /// Converts a value to a cons pointer.
+    pub const fn from_value(value: V) -> Self {
         Self(value)
     }
 
