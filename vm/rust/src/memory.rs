@@ -174,19 +174,33 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 mod tests {
     use super::*;
     use crate::Value64;
+    use core::hash::Hash;
     use pretty_assertions::assert_eq;
+    use std::collections::HashSet;
 
     const HEAP_SIZE: usize = 1 << 10;
 
-    fn assert_equal_values<const N: usize>(
-        x_memory: &Memory<Value64, [Value64; N]>,
-        y_memory: &Memory<Value64, [Value64; N]>,
-        x: Value64,
-        y: Value64,
+    fn assert_equal_values<V: Value + Hash, const N: usize>(
+        x_memory: &Memory<V, [V; N]>,
+        y_memory: &Memory<V, [V; N]>,
+        x: V,
+        y: V,
+    ) {
+        let mut values = Default::default();
+
+        assert_recursive_equal_values(&mut values, x_memory, y_memory, x, y)
+    }
+
+    fn assert_recursive_equal_values<V: Value + Hash, const N: usize>(
+        values: &mut HashSet<V>,
+        x_memory: &Memory<V, [V; N]>,
+        y_memory: &Memory<V, [V; N]>,
+        x: V,
+        y: V,
     ) {
         assert_eq!(x.is_pointer(), y.is_pointer());
 
-        if x.is_pointer() {
+        if x.is_pointer() && !values.contains(&x) {
             assert_eq!(x.is_marked(), y.is_marked());
 
             let x = Cons::from(x);
@@ -194,14 +208,18 @@ mod tests {
 
             assert_eq!(x.tag(), y.tag());
 
-            assert_equal_values(
+            values.insert(x.into());
+
+            assert_recursive_equal_values(
+                values,
                 x_memory,
                 y_memory,
                 x_memory.get(x.index()).unwrap(),
                 y_memory.get(y.index()).unwrap(),
             );
 
-            assert_equal_values(
+            assert_recursive_equal_values(
+                values,
                 x_memory,
                 y_memory,
                 x_memory.get(x.index() + 1).unwrap(),
@@ -306,6 +324,22 @@ mod tests {
                 .allocate(Value64::from_number(3), Value64::from_number(4))
                 .unwrap();
             let cons = memory.allocate(car.into(), cdr.into()).unwrap();
+            memory.set_root(cons.into());
+
+            let old_memory = memory.clone();
+            memory.collect_garbages().unwrap();
+
+            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+        }
+
+        #[test]
+        fn collect_recursive_cons_in_car() {
+            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory
+                .allocate(Default::default(), Value64::from_number(42))
+                .unwrap();
+            memory.set(cons.index(), cons.into()).unwrap();
             memory.set_root(cons.into());
 
             let old_memory = memory.clone();
