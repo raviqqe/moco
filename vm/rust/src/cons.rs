@@ -54,4 +54,12 @@ mod tests {
     fn set_tag() {
         assert_eq!(Cons::<Value64>::new(0).set_tag(42).tag(), 42);
     }
+
+    #[test]
+    fn set_tag_twice() {
+        assert_eq!(
+            Cons::<Value64>::new(0).set_tag(Tag::MAX).set_tag(42).tag(),
+            42
+        );
+    }
 }
