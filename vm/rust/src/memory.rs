@@ -100,6 +100,8 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         let mut previous = V::default();
         let mut current = self.root;
 
+        trace!("begin");
+
         loop {
             if current.is_pointer() && !self.get(Cons::from(current).index())?.is_marked() {
                 trace!("forward");
