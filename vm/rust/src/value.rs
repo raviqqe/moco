@@ -14,15 +14,13 @@ pub trait Value:
     + Ord
     + From<Cons<Self>>
     + From<Self::Number>
+    + Into<Self::Number>
 {
     /// A number.
     type Number: Integer;
 
     /// A pointer.
     type Pointer: Integer;
-
-    /// Converts a value to a number.
-    fn to_number(self) -> Self::Number;
 
     /// Converts a pointer to a value.
     fn from_pointer(pointer: Self::Pointer) -> Self;
@@ -59,11 +57,6 @@ macro_rules! impl_value {
             type Pointer = $pointer;
 
             #[inline]
-            fn to_number(self) -> Self::Number {
-                self.0 as Self::Number >> 2
-            }
-
-            #[inline]
             fn from_pointer(pointer: Self::Pointer) -> Self {
                 Self(pointer << 2)
             }
@@ -92,6 +85,12 @@ macro_rules! impl_value {
         impl From<$number> for $value {
             fn from(number: $number) -> $value {
                 Self(((number << 2) | 1) as _)
+            }
+        }
+
+        impl Into<$number> for $value {
+            fn into(self) -> $number {
+                self.0 as $number >> 2
             }
         }
 
@@ -127,6 +126,10 @@ mod tests {
                     number.into()
                 }
 
+                fn to_number(value: $value) -> <$value as Value>::Number {
+                    value.into()
+                }
+
                 fn from_pointer(pointer: <$value as Value>::Pointer) -> $value {
                     <$value as Value>::from_pointer(pointer)
                 }
@@ -146,11 +149,11 @@ mod tests {
 
                 #[test]
                 fn convert_number() {
-                    assert_eq!(from_number(-42).to_number(), -42);
-                    assert_eq!(from_number(-1).to_number(), -1);
-                    assert_eq!(from_number(0).to_number(), 0);
-                    assert_eq!(from_number(1).to_number(), 1);
-                    assert_eq!(from_number(42).to_number(), 42);
+                    assert_eq!(to_number(from_number(-42)), -42);
+                    assert_eq!(to_number(from_number(-1)), -1);
+                    assert_eq!(to_number(from_number(0)), 0);
+                    assert_eq!(to_number(from_number(1)), 1);
+                    assert_eq!(to_number(from_number(42)), 42);
                 }
 
                 #[test]
@@ -176,12 +179,13 @@ mod tests {
                 fn mark_number() {
                     assert!(!from_number(0).mark(false).is_marked());
                     assert!(from_number(0).mark(true).is_marked());
-                    assert_eq!(from_number(0).mark(false).to_number(), 0);
-                    assert_eq!(from_number(42).mark(false).to_number(), 42);
-                    assert_eq!(from_number(-42).mark(false).to_number(), -42);
-                    assert_eq!(from_number(0).mark(true).to_number(), 0);
-                    assert_eq!(from_number(42).mark(true).to_number(), 42);
-                    assert_eq!(from_number(-42).mark(true).to_number(), -42);
+
+                    assert_eq!(to_number(from_number(0).mark(false)), 0);
+                    assert_eq!(to_number(from_number(42).mark(false)), 42);
+                    assert_eq!(to_number(from_number(-42).mark(false)), -42);
+                    assert_eq!(to_number(from_number(0).mark(true)), 0);
+                    assert_eq!(to_number(from_number(42).mark(true)), 42);
+                    assert_eq!(to_number(from_number(-42).mark(true)), -42);
                 }
 
                 #[test]
