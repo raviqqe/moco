@@ -101,8 +101,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
                 previous = current;
                 current = next;
             } else if current.is_pointer() && Cons::from(current).index().is_multiple_of(2) {
-                let cons = Cons::from(current);
-                current = Cons::new(cons.index() + 1).into();
+                current = Cons::new(Cons::from(current).index() + 1).into();
             } else if !previous.is_pointer() {
                 break;
             } else {
