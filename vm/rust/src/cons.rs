@@ -25,9 +25,11 @@ impl<V: Value> Cons<V> {
 
     /// Sets a tag.
     pub fn set_tag(self, tag: Tag) -> Self {
-        Self(V::from_pointer(
-            self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | V::Pointer::from(tag),
-        ))
+        Self(
+            self.0.set_pointer(
+                self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | V::Pointer::from(tag),
+            ),
+        )
     }
 
     /// Converts a cons pointer to a value.
