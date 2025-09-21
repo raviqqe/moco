@@ -133,6 +133,11 @@ mod tests {
                 }
 
                 #[test]
+                fn zero() {
+                    assert_eq!(from_number(0), Default::default());
+                }
+
+                #[test]
                 fn convert_number() {
                     assert_eq!(from_number(-42).to_number(), -42);
                     assert_eq!(from_number(-1).to_number(), -1);
