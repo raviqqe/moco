@@ -23,6 +23,13 @@ impl<V: Value> Cons<V> {
         self.0.to_pointer().to_usize() as _
     }
 
+    /// Sets an index.
+    pub fn set_index(self, index: usize) -> Self {
+        Self(self.0.set_pointer(
+            self.0.to_pointer() & V::Pointer::from(Tag::MAX) | V::Pointer::from_usize(index),
+        ))
+    }
+
     /// Sets a tag.
     pub fn set_tag(self, tag: Tag) -> Self {
         Self(
