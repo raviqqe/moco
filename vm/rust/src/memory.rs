@@ -349,5 +349,21 @@ mod tests {
 
             assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
         }
+
+        #[test]
+        fn collect_recursive_cons_in_cdr() {
+            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory
+                .allocate(Value64::from_number(42), Default::default())
+                .unwrap();
+            memory.set(cons.index() + 1, cons.into()).unwrap();
+            memory.set_root(cons.into());
+
+            let old_memory = memory.clone();
+            memory.collect_garbages().unwrap();
+
+            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+        }
     }
 }
