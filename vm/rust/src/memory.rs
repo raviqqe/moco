@@ -138,8 +138,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
                 previous = self.get(previous_cons.index())?;
                 self.set(
                     previous_cons.index(),
-                    V::from(Cons::new(current_cons.index() - 1).set_tag(current_cons.tag()))
-                        .mark(true),
+                    V::from(current_cons.set_index(current_cons.index() - 1)).mark(true),
                 )?;
                 current = previous_cons.into();
             }
