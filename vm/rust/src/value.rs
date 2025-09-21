@@ -4,7 +4,7 @@ use core::fmt::Debug;
 
 /// A value.
 pub trait Value:
-    Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord + From<Cons<Self>>
+    Clone + Copy + Debug + Default + PartialEq + Eq + PartialOrd + Ord + From<Cons<Self>>
 {
     /// A number.
     type Number: Integer;
