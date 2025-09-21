@@ -1,6 +1,6 @@
 use core::{
     fmt::{Debug, Display},
-    ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Shl, Shr, Sub},
+    ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Not, Shl, Shr, Sub},
 };
 
 /// An integer.
@@ -11,9 +11,10 @@ pub trait Integer:
     + Div
     + Shl
     + Shr
-    + BitAnd
-    + BitOr
-    + BitXor
+    + Not<Output = Self>
+    + BitAnd<Output = Self>
+    + BitOr<Output = Self>
+    + BitXor<Output = Self>
     + PartialEq
     + Eq
     + PartialOrd
@@ -23,6 +24,7 @@ pub trait Integer:
     + Default
     + Debug
     + Display
+    + From<u8>
 {
     /// A size in bits.
     const BITS: usize;
@@ -30,10 +32,10 @@ pub trait Integer:
     /// A mask.
     const MASK: Self;
 
-    /// Converts a `usize` to an integer.
+    /// Converts `usize` to an integer.
     fn from_usize(value: usize) -> Self;
 
-    /// Converts an integer to a `usize`.
+    /// Converts an integer to `usize`.
     fn to_usize(self) -> usize;
 }
 
@@ -54,7 +56,6 @@ macro_rules! impl_integer {
     };
 }
 
-impl_integer!(i8);
 impl_integer!(i16);
 impl_integer!(i32);
 impl_integer!(i64);

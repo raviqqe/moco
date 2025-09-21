@@ -1,8 +1,11 @@
-use crate::{Integer, cons::Cons};
+use crate::Integer;
+use crate::cons::Cons;
 use core::fmt::Debug;
 
 /// A value.
-pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
+pub trait Value:
+    Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord + From<Cons<Self>>
+{
     /// A number.
     type Number: Integer;
 
@@ -16,7 +19,7 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     fn to_number(self) -> Self::Number;
 
     /// Converts a pointer to a value.
-    fn from_pointer(cons: Self::Pointer) -> Self;
+    fn from_pointer(pointer: Self::Pointer) -> Self;
 
     /// Converts a value to a pointer.
     fn to_pointer(self) -> Self::Pointer;
@@ -30,14 +33,9 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     /// Returns `true` if a value is marked.
     fn is_marked(self) -> bool;
 
-    /// Converts a value to a cons.
-    fn to_cons(self) -> Cons<Self> {
-        Cons::from_value(self)
-    }
-
-    /// Converts a value to a cons.
-    fn from_cons(cons: Cons<Self>) -> Self {
-        cons.to_value()
+    /// Returns a zero.
+    fn zero() -> Self {
+        Self::from_number(Default::default())
     }
 }
 
@@ -92,6 +90,12 @@ macro_rules! impl_value {
             #[inline]
             fn is_marked(self) -> bool {
                 self.0 & 0b10 != 0
+            }
+        }
+
+        impl From<Cons<$value>> for $value {
+            fn from(cons: Cons<$value>) -> $value {
+                cons.to_value()
             }
         }
     };
