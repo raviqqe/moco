@@ -85,6 +85,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         Ok(cons)
     }
 
+    #[inline]
     fn is_out_of_memory(&self) -> bool {
         !self.free.is_pointer()
     }
