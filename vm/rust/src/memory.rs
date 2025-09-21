@@ -114,11 +114,16 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
             let cons = Cons::from(current);
             let value = self.get(cons.index())?;
 
-            if !value.is_marked() && value.is_pointer() {
+            if !value.is_marked() {
                 trace!("gc", "forward");
-                self.set(cons.index(), previous.mark(true))?;
-                previous = current;
-                current = value;
+
+                if value.is_pointer() {
+                    self.set(cons.index(), previous.mark(true))?;
+                    previous = current;
+                    current = value;
+                } else {
+                    self.set(cons.index(), value.mark(true))?;
+                }
             } else if cons.index().is_multiple_of(2) {
                 trace!("gc", "cdr");
                 current = Cons::new(cons.index() + 1).into();
