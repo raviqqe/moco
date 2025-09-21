@@ -105,6 +105,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
             } else if !previous.is_pointer() {
                 break;
             } else {
+                // TODO
                 let previous_cons = Cons::from(previous);
                 let current_cons = Cons::from(current);
                 previous = self.get(previous_cons.index())?;
