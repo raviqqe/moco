@@ -145,4 +145,12 @@ mod tests {
     fn create() {
         Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
     }
+
+    #[test]
+    fn allocate() {
+        let mut memory =
+            Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
+
+        memory.allocate(Value::zero(), Value::zero()).unwrap();
+    }
 }
