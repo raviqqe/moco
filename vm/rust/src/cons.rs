@@ -10,9 +10,7 @@ pub struct Cons<V>(V);
 impl<V: Value> Cons<V> {
     /// Creates a cons pointer.
     pub fn new(index: usize) -> Self {
-        Self(V::from_pointer(V::Pointer::from_usize(
-            index.to_usize() << Tag::BITS,
-        )))
+        Self(V::from_pointer(V::Pointer::from_usize(index) << Tag::BITS))
     }
 
     /// Returns an index.

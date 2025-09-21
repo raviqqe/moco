@@ -10,7 +10,9 @@ pub trait Integer:
     + Mul
     + Div
     + Shl
+    + Shl<u32, Output = Self>
     + Shr
+    + Shr<u32, Output = Self>
     + Not<Output = Self>
     + BitAnd<Output = Self>
     + BitOr<Output = Self>

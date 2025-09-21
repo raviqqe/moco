@@ -29,6 +29,14 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         Ok(this)
     }
 
+    fn heap(&self) -> &[V] {
+        self.heap.as_ref()
+    }
+
+    fn heap_mut(&mut self) -> &mut [V] {
+        self.heap.as_mut()
+    }
+
     /// Returns a root.
     #[inline]
     pub const fn root(&self) -> V {
@@ -39,14 +47,6 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
     #[inline]
     pub const fn set_root(&mut self, value: V) {
         self.root = value;
-    }
-
-    fn heap(&self) -> &[V] {
-        self.heap.as_ref()
-    }
-
-    fn heap_mut(&mut self) -> &mut [V] {
-        self.heap.as_mut()
     }
 
     /// Returns a value at an index.
@@ -85,6 +85,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         Ok(cons)
     }
 
+    #[inline]
     fn is_out_of_memory(&self) -> bool {
         !self.free.is_pointer()
     }
