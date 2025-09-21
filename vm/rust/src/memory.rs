@@ -95,8 +95,6 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
         loop {
             if current.is_pointer() && !self.get(Cons::from(current).index())?.is_marked() {
-                #[cfg(test)]
-                std::dbg!("forward");
                 let cons = Cons::from(current);
                 let next = self.get(cons.index())?;
                 self.set(cons.index(), previous.mark(true))?;
@@ -107,8 +105,6 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
             } else if !previous.is_pointer() {
                 break;
             } else {
-                #[cfg(test)]
-                std::dbg!("backward");
                 // TODO
                 let previous_cons = Cons::from(previous);
                 let current_cons = Cons::from(current);
