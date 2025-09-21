@@ -143,6 +143,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 mod tests {
     use super::*;
     use crate::Value64;
+    use pretty_assertions::assert_eq;
 
     const HEAP_SIZE: usize = 1 << 10;
 
@@ -185,13 +186,46 @@ mod tests {
         Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
     }
 
-    #[test]
-    fn allocate() {
-        let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
+    mod allocation {
+        use super::*;
 
-        memory
-            .allocate(Default::default(), Default::default())
-            .unwrap();
+        #[test]
+        fn allocate_cons_cell() {
+            let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+
+            assert_equal_values(&memory, &memory, cons.into(), cons.into());
+        }
+
+        #[test]
+        fn allocate_two_cons_cells() {
+            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+            let cons = memory.allocate(Default::default(), cons.into()).unwrap();
+
+            assert_equal_values(&memory, &memory, cons.into(), cons.into());
+        }
+
+        #[test]
+        fn allocate_three_cons_cells() {
+            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+
+            let car = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+            let cdr = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+            let cons = memory.allocate(car.into(), cdr.into()).unwrap();
+
+            assert_equal_values(&memory, &memory, cons.into(), cons.into());
+        }
     }
 
     mod garbage_collection {
