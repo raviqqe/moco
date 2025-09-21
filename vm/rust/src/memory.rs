@@ -103,6 +103,8 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         trace!("gc", "begin");
 
         loop {
+            trace!("gc", (previous, current));
+
             if current.is_pointer() && !self.get(Cons::from(current).index())?.is_marked() {
                 trace!("gc", "forward");
                 let cons = Cons::from(current);
