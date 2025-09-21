@@ -95,6 +95,8 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
         loop {
             if current.is_pointer() && !self.get(Cons::from(current).index())?.is_marked() {
+                #[cfg(test)]
+                std::dbg!("forward");
                 let cons = Cons::from(current);
                 let next = self.get(cons.index())?;
                 self.set(cons.index(), previous.mark(true))?;
@@ -105,6 +107,8 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
             } else if !previous.is_pointer() {
                 break;
             } else {
+                #[cfg(test)]
+                std::dbg!("backward");
                 // TODO
                 let previous_cons = Cons::from(previous);
                 let current_cons = Cons::from(current);
@@ -236,7 +240,7 @@ mod tests {
             let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
 
             let cons = memory
-                .allocate(Default::default(), Default::default())
+                .allocate(Value64::from_number(1), Value64::from_number(2))
                 .unwrap();
 
             let old_memory = memory.clone();
@@ -250,9 +254,12 @@ mod tests {
             let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
 
             let cons = memory
-                .allocate(Default::default(), Default::default())
+                .allocate(Value64::from_number(1), Value64::from_number(2))
                 .unwrap();
-            let cons = memory.allocate(Default::default(), cons.into()).unwrap();
+            let cons = memory
+                .allocate(Value64::from_number(3), cons.into())
+                .unwrap();
+            memory.set_root(cons.into());
 
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
@@ -265,12 +272,13 @@ mod tests {
             let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
 
             let car = memory
-                .allocate(Default::default(), Default::default())
+                .allocate(Value64::from_number(1), Value64::from_number(2))
                 .unwrap();
             let cdr = memory
-                .allocate(Default::default(), Default::default())
+                .allocate(Value64::from_number(3), Value64::from_number(4))
                 .unwrap();
             let cons = memory.allocate(car.into(), cdr.into()).unwrap();
+            memory.set_root(cons.into());
 
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
