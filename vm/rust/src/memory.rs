@@ -109,7 +109,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         loop {
             trace!("gc", (previous, current));
 
-            debug_assert!(current.is_pointer() || !self.root.is_pointer());
+            debug_assert!(current.is_pointer());
 
             let cons = Cons::from(current);
             let value = self.get(cons.index())?;
