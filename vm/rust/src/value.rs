@@ -88,9 +88,9 @@ macro_rules! impl_value {
             }
         }
 
-        impl Into<$number> for $value {
-            fn into(self) -> $number {
-                self.0 as $number >> 2
+        impl From<$value> for $number {
+            fn from(value: $value) -> $number {
+                value.0 as $number >> 2
             }
         }
 
