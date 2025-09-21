@@ -97,6 +97,10 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
     }
 
     fn mark(&mut self) -> Result<(), Error> {
+        if !self.root.is_pointer() {
+            return Ok(());
+        }
+
         let mut previous = V::default();
         let mut current = self.root;
 
@@ -105,16 +109,19 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         loop {
             trace!("gc", (previous, current));
 
-            if current.is_pointer() && !self.get(Cons::from(current).index())?.is_marked() {
+            debug_assert!(current.is_pointer() || !self.root.is_pointer());
+
+            let cons = Cons::from(current);
+            let value = self.get(cons.index())?;
+
+            if !value.is_marked() && value.is_pointer() {
                 trace!("gc", "forward");
-                let cons = Cons::from(current);
-                let next = self.get(cons.index())?;
                 self.set(cons.index(), previous.mark(true))?;
                 previous = current;
-                current = next;
-            } else if current.is_pointer() && Cons::from(current).index().is_multiple_of(2) {
+                current = value;
+            } else if cons.index().is_multiple_of(2) {
                 trace!("gc", "cdr");
-                current = Cons::new(Cons::from(current).index() + 1).into();
+                current = Cons::new(cons.index() + 1).into();
             } else if !previous.is_pointer() {
                 trace!("gc", "end");
                 break;
