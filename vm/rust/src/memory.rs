@@ -163,6 +163,13 @@ mod tests {
                 x_memory.get(x.index()).unwrap(),
                 y_memory.get(y.index()).unwrap(),
             );
+
+            assert_equal_values(
+                x_memory,
+                y_memory,
+                x_memory.get(x.index() + 1).unwrap(),
+                y_memory.get(y.index() + 1).unwrap(),
+            );
         } else {
             assert_eq!(x, y)
         }
