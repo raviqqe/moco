@@ -286,9 +286,7 @@ mod tests {
         fn collect_cons() {
             let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
 
-            let cons = memory
-                .allocate(Value64::from_number(1), Value64::from_number(2))
-                .unwrap();
+            let cons = memory.allocate(1.into(), 2.into()).unwrap();
             memory.set_root(cons.into());
 
             let old_memory = memory.clone();
@@ -301,12 +299,8 @@ mod tests {
         fn collect_two_cons_cells() {
             let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
 
-            let cons = memory
-                .allocate(Value64::from_number(1), Value64::from_number(2))
-                .unwrap();
-            let cons = memory
-                .allocate(Value64::from_number(3), cons.into())
-                .unwrap();
+            let cons = memory.allocate(1.into(), 2.into()).unwrap();
+            let cons = memory.allocate(3.into(), cons.into()).unwrap();
             memory.set_root(cons.into());
 
             let old_memory = memory.clone();
@@ -319,12 +313,8 @@ mod tests {
         fn collect_three_cons_cells() {
             let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
 
-            let car = memory
-                .allocate(Value64::from_number(1), Value64::from_number(2))
-                .unwrap();
-            let cdr = memory
-                .allocate(Value64::from_number(3), Value64::from_number(4))
-                .unwrap();
+            let car = memory.allocate(1.into(), 2.into()).unwrap();
+            let cdr = memory.allocate(3.into(), 4.into()).unwrap();
             let cons = memory.allocate(car.into(), cdr.into()).unwrap();
             memory.set_root(cons.into());
 
@@ -338,9 +328,7 @@ mod tests {
         fn collect_recursive_cons_in_car() {
             let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
 
-            let cons = memory
-                .allocate(Default::default(), Value64::from_number(42))
-                .unwrap();
+            let cons = memory.allocate(Default::default(), 42.into()).unwrap();
             memory.set(cons.index(), cons.into()).unwrap();
             memory.set_root(cons.into());
 
@@ -354,9 +342,7 @@ mod tests {
         fn collect_recursive_cons_in_cdr() {
             let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
 
-            let cons = memory
-                .allocate(Value64::from_number(42), Default::default())
-                .unwrap();
+            let cons = memory.allocate(42.into(), Default::default()).unwrap();
             memory.set(cons.index() + 1, cons.into()).unwrap();
             memory.set_root(cons.into());
 

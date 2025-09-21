@@ -27,7 +27,9 @@ impl<V: Value> Cons<V> {
 
     /// Sets a tag.
     pub fn set_tag(self, tag: Tag) -> Self {
-        Self(V::from_pointer(self.0.to_pointer() | V::Pointer::from(tag)))
+        Self(V::from_pointer(
+            self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | V::Pointer::from(tag),
+        ))
     }
 
     /// Converts a cons pointer to a value.
@@ -41,5 +43,25 @@ impl<V: Value> From<V> for Cons<V> {
         debug_assert!(value.is_pointer());
 
         Self(value)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Value64;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn set_tag() {
+        assert_eq!(Cons::<Value64>::new(0).set_tag(42).tag(), 42);
+    }
+
+    #[test]
+    fn set_tag_twice() {
+        assert_eq!(
+            Cons::<Value64>::new(0).set_tag(Tag::MAX).set_tag(42).tag(),
+            42
+        );
     }
 }
