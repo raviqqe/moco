@@ -156,8 +156,10 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
             let value = self.get(index)?;
 
             if value.is_marked() {
-                self.set(index, value.mark(false))?;
-                self.set(index + 1, self.get(index + 1)?.mark(false))?;
+                for field in [0, 1] {
+                    let index = index + field;
+                    self.set(index, self.get(index)?.mark(false))?;
+                }
             } else {
                 self.set(index + 1, self.free)?;
                 self.free = Cons::new(index).into();
