@@ -1,6 +1,7 @@
 use crate::{Cons, error::Error, heap::Heap, value::Value};
 
 /// A memory on a virtual machine.
+#[cfg_attr(test, derive(Clone))]
 pub struct Memory<V: Value, H: Heap<V>> {
     heap: H,
     root: V,
@@ -140,6 +141,33 @@ mod tests {
 
     const HEAP_SIZE: usize = 1 << 10;
 
+    fn assert_equal_values<const N: usize>(
+        x_memory: &Memory<Value64, [Value64; N]>,
+        y_memory: &Memory<Value64, [Value64; N]>,
+        x: Value64,
+        y: Value64,
+    ) {
+        assert_eq!(x.is_pointer(), y.is_pointer());
+
+        if x.is_pointer() {
+            assert_eq!(x.is_marked(), y.is_marked());
+
+            let x = Cons::from(x);
+            let y = Cons::from(y);
+
+            assert_eq!(x.tag(), y.tag());
+
+            assert_equal_values(
+                x_memory,
+                y_memory,
+                x_memory.get(x.index()).unwrap(),
+                y_memory.get(y.index()).unwrap(),
+            );
+        } else {
+            assert_eq!(x, y)
+        }
+    }
+
     #[test]
     fn create() {
         Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
@@ -152,5 +180,53 @@ mod tests {
         memory
             .allocate(Default::default(), Default::default())
             .unwrap();
+    }
+
+    mod garbage_collection {
+        use super::*;
+
+        #[test]
+        fn collect_cons() {
+            let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+            let old_memory = memory.clone();
+            memory.collect_garbages().unwrap();
+
+            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+        }
+
+        #[test]
+        fn collect_two_cons_cells() {
+            let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+            let cons = memory.allocate(Default::default(), cons.into()).unwrap();
+            let old_memory = memory.clone();
+            memory.collect_garbages().unwrap();
+
+            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+        }
+
+        #[test]
+        fn collect_three_cons_cells() {
+            let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
+
+            let car = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+            let cdr = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+            let cons = memory.allocate(car.into(), cdr.into()).unwrap();
+            let old_memory = memory.clone();
+            memory.collect_garbages().unwrap();
+
+            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+        }
     }
 }
