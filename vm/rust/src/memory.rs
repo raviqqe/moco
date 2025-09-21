@@ -1,5 +1,12 @@
 use crate::{Cons, error::Error, heap::Heap, value::Value};
 
+macro_rules! trace {
+    ($($x:expr)*) => {
+        #[cfg(test)]
+        std::dbg!($($x)*);
+    };
+}
+
 /// A memory on a virtual machine.
 #[cfg_attr(test, derive(Clone))]
 pub struct Memory<V: Value, H: Heap<V>> {
@@ -95,17 +102,20 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
         loop {
             if current.is_pointer() && !self.get(Cons::from(current).index())?.is_marked() {
+                trace!("forward");
                 let cons = Cons::from(current);
                 let next = self.get(cons.index())?;
                 self.set(cons.index(), previous.mark(true))?;
                 previous = current;
                 current = next;
             } else if current.is_pointer() && Cons::from(current).index().is_multiple_of(2) {
+                trace!("cdr");
                 current = Cons::new(Cons::from(current).index() + 1).into();
             } else if !previous.is_pointer() {
+                trace!("end");
                 break;
             } else {
-                // TODO
+                trace!("backward");
                 let previous_cons = Cons::from(previous);
                 let current_cons = Cons::from(current);
                 previous = self.get(previous_cons.index())?;
