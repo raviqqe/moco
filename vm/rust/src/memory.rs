@@ -1,52 +1,37 @@
-use crate::{Cons, error::Error, heap::Heap, value::Value};
+use crate::{error::Error, heap::Heap, value::Value};
 
 /// A memory on a virtual machine.
-#[cfg_attr(test, derive(Clone))]
 pub struct Memory<V: Value, H: Heap<V>> {
+    root: V::Pointer,
     heap: H,
-    root: V,
-    free: V,
 }
 
 impl<V: Value, H: Heap<V>> Memory<V, H> {
     /// Creates a memory.
-    pub fn new(heap: H) -> Result<Self, Error> {
-        let mut this = Self {
+    pub fn new(heap: H) -> Self {
+        Self {
+            root: Default::default(),
             heap,
-            root: V::from_number(Default::default()),
-            free: Default::default(),
-        };
-
-        // TODO Use garbage collection instead.
-        this.collect_garbages()?;
-
-        Ok(this)
+        }
     }
 
     /// Returns a root.
     #[inline]
-    pub const fn root(&self) -> V {
+    pub const fn root(&self) -> V::Pointer {
         self.root
     }
 
     /// Sets a root.
     #[inline]
-    pub const fn set_root(&mut self, value: V) {
-        self.root = value;
-    }
-
-    fn heap(&self) -> &[V] {
-        self.heap.as_ref()
-    }
-
-    fn heap_mut(&mut self) -> &mut [V] {
-        self.heap.as_mut()
+    pub const fn set_root(&mut self, pointer: V::Pointer) {
+        self.root = pointer;
     }
 
     /// Returns a value at an index.
     #[inline]
     pub fn get(&self, index: usize) -> Result<V, Error> {
-        self.heap()
+        self.heap
+            .as_ref()
             .get(index)
             .copied()
             .ok_or(Error::InvalidMemoryAccess)
@@ -56,7 +41,8 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
     #[inline]
     pub fn set(&mut self, index: usize, value: V) -> Result<(), Error> {
         *self
-            .heap_mut()
+            .heap
+            .as_mut()
             .get_mut(index)
             .ok_or(Error::InvalidMemoryAccess)? = value;
 
@@ -65,183 +51,31 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
     /// Allocates a cons.
     #[inline]
-    pub fn allocate(&mut self, car: V, cdr: V) -> Result<Cons<V>, Error> {
+    pub fn allocate(&mut self, car: V, cdr: V) -> Result<V::Pointer, Error> {
+        let mut cons = self.allocate_unchecked(car, cdr)?;
+
         if self.is_out_of_memory() || cfg!(feature = "gc_always") {
-            self.collect_garbages()?;
+            self.collect_garbages(Some(&mut cons))?;
         }
-
-        let cons = Cons::from(self.free);
-
-        self.free = self.get(cons.index() + 1)?.into();
-        self.set(cons.index(), car)?;
-        self.set(cons.index() + 1, cdr)?;
 
         Ok(cons)
     }
 
-    fn is_out_of_memory(&self) -> bool {
-        !self.free.is_pointer()
+    // TODO
+    #[expect(clippy::unused_self)]
+    fn allocate_unchecked(&mut self, _car: V, _cdr: V) -> Result<V::Pointer, Error> {
+        Ok(Default::default())
     }
 
-    pub(crate) fn collect_garbages(&mut self) -> Result<(), Error> {
-        self.mark()?;
-        self.sweep()?;
+    // TODO
+    #[expect(clippy::unused_self)]
+    const fn is_out_of_memory(&self) -> bool {
+        false
+    }
 
+    // TODO
+    #[expect(clippy::unused_self)]
+    const fn collect_garbages(&mut self, _cons: Option<&mut V::Pointer>) -> Result<(), Error> {
         Ok(())
-    }
-
-    fn mark(&mut self) -> Result<(), Error> {
-        let mut previous = V::default();
-        let mut current = self.root;
-
-        loop {
-            if current.is_pointer() && !self.get(Cons::from(current).index())?.is_marked() {
-                let cons = Cons::from(current);
-                let next = self.get(cons.index())?;
-                self.set(cons.index(), previous.mark(true))?;
-                previous = current;
-                current = next;
-            } else if current.is_pointer() && Cons::from(current).index().is_multiple_of(2) {
-                current = Cons::new(Cons::from(current).index() + 1).into();
-            } else if !previous.is_pointer() {
-                break;
-            } else {
-                let previous_cons = Cons::from(previous);
-                let current_cons = Cons::from(current);
-                previous = self.get(previous_cons.index())?;
-                self.set(
-                    previous_cons.index(),
-                    V::from(Cons::new(current_cons.index() - 1).set_tag(current_cons.tag()))
-                        .mark(true),
-                )?;
-                current = previous_cons.into();
-            }
-        }
-
-        Ok(())
-    }
-
-    fn sweep(&mut self) -> Result<(), Error> {
-        self.free = Default::default();
-
-        for index in (0..self.heap().len()).step_by(2) {
-            let value = self.get(index)?;
-
-            if value.is_marked() {
-                self.set(index, value.mark(false))?;
-            } else {
-                self.set(index + 1, self.free)?;
-                self.free = Cons::new(index).into();
-            }
-        }
-
-        Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::Value64;
-
-    const HEAP_SIZE: usize = 1 << 10;
-
-    fn assert_equal_values<const N: usize>(
-        x_memory: &Memory<Value64, [Value64; N]>,
-        y_memory: &Memory<Value64, [Value64; N]>,
-        x: Value64,
-        y: Value64,
-    ) {
-        assert_eq!(x.is_pointer(), y.is_pointer());
-
-        if x.is_pointer() {
-            assert_eq!(x.is_marked(), y.is_marked());
-
-            let x = Cons::from(x);
-            let y = Cons::from(y);
-
-            assert_eq!(x.tag(), y.tag());
-
-            assert_equal_values(
-                x_memory,
-                y_memory,
-                x_memory.get(x.index()).unwrap(),
-                y_memory.get(y.index()).unwrap(),
-            );
-
-            assert_equal_values(
-                x_memory,
-                y_memory,
-                x_memory.get(x.index() + 1).unwrap(),
-                y_memory.get(y.index() + 1).unwrap(),
-            );
-        } else {
-            assert_eq!(x, y)
-        }
-    }
-
-    #[test]
-    fn create() {
-        Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
-    }
-
-    #[test]
-    fn allocate() {
-        let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
-
-        memory
-            .allocate(Default::default(), Default::default())
-            .unwrap();
-    }
-
-    mod garbage_collection {
-        use super::*;
-
-        #[test]
-        fn collect_cons() {
-            let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
-
-            let cons = memory
-                .allocate(Default::default(), Default::default())
-                .unwrap();
-
-            let old_memory = memory.clone();
-            memory.collect_garbages().unwrap();
-
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
-        }
-
-        #[test]
-        fn collect_two_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
-
-            let cons = memory
-                .allocate(Default::default(), Default::default())
-                .unwrap();
-            let cons = memory.allocate(Default::default(), cons.into()).unwrap();
-
-            let old_memory = memory.clone();
-            memory.collect_garbages().unwrap();
-
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
-        }
-
-        #[test]
-        fn collect_three_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
-
-            let car = memory
-                .allocate(Default::default(), Default::default())
-                .unwrap();
-            let cdr = memory
-                .allocate(Default::default(), Default::default())
-                .unwrap();
-            let cons = memory.allocate(car.into(), cdr.into()).unwrap();
-
-            let old_memory = memory.clone();
-            memory.collect_garbages().unwrap();
-
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
-        }
     }
 }
