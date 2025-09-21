@@ -25,6 +25,11 @@ impl<V: Value> Cons<V> {
         self.0.to_pointer().to_usize() as _
     }
 
+    /// Sets a tag.
+    pub fn set_tag(self, tag: Tag) -> Self {
+        Self(V::from_pointer(self.0.to_pointer() | V::Pointer::from(tag)))
+    }
+
     /// Converts a cons pointer to a value.
     pub const fn to_value(self) -> V {
         self.0

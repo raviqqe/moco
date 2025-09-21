@@ -106,10 +106,15 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
             } else if !previous.is_pointer() {
                 break;
             } else {
-                let cons = Cons::from(previous);
-                previous = self.get(cons.index())?;
-                self.set(cons.index(), current)?;
-                current = cons.into();
+                let previous_cons = Cons::from(previous);
+                let current_cons = Cons::from(current);
+                previous = self.get(previous_cons.index())?;
+                self.set(
+                    previous_cons.index(),
+                    V::from(Cons::new(current_cons.index() - 1).set_tag(current_cons.tag()))
+                        .mark(true),
+                )?;
+                current = previous_cons.into();
             }
         }
 
