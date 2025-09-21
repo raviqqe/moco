@@ -11,6 +11,9 @@ categories = ["no-std", "no-std::no-alloc", "wasm"]
 
 [dependencies]
 
+[dev-dependencies]
+pretty_assertions = "1.4.1"
+
 [features]
 alloc = []
 gc_always = []
