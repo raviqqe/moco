@@ -103,13 +103,13 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
             } else if Cons::from(current).index().is_multiple_of(2) {
                 let cons = Cons::from(current);
                 current = Cons::new(cons.index() + 1).into();
-            } else if previous.is_pointer() {
+            } else if !previous.is_pointer() {
                 break;
             } else {
-                let value = previous;
-                previous = self.get(Cons::from(previous).index() - 1)?;
-                self.set(Cons::from(current).index(), previous)?;
-                current = value;
+                let cons = Cons::from(previous);
+                previous = self.get(cons.index())?;
+                self.set(cons.index(), current)?;
+                current = cons.into();
             }
         }
 
