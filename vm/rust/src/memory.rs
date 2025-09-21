@@ -128,10 +128,10 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
                 trace!("gc", "cdr");
                 current = Cons::new(cons.index() + 1).into();
             } else if !previous.is_pointer() {
-                trace!("gc", "end");
                 break;
             } else {
                 trace!("gc", "backward");
+
                 let previous_cons = Cons::from(previous);
                 let current_cons = Cons::from(current);
                 previous = self.get(previous_cons.index())?;
@@ -143,6 +143,8 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
                 current = previous_cons.into();
             }
         }
+
+        trace!("gc", "end");
 
         Ok(())
     }
