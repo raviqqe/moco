@@ -82,7 +82,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         !self.free.is_pointer()
     }
 
-    fn collect_garbages(&mut self) -> Result<(), Error> {
+    pub(crate) fn collect_garbages(&mut self) -> Result<(), Error> {
         self.mark()?;
         self.sweep()?;
 
@@ -116,7 +116,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
     }
 
     fn sweep(&mut self) -> Result<(), Error> {
-        self.free = V::default();
+        self.free = Default::default();
 
         for index in (0..self.heap().len()).step_by(2) {
             let value = self.get(index)?;
