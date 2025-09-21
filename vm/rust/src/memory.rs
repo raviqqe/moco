@@ -78,7 +78,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
         let cons = Cons::from(self.free);
 
-        self.free = self.get(cons.index() + 1)?.into();
+        self.free = self.get(cons.index() + 1)?;
         self.set(cons.index(), car)?;
         self.set(cons.index() + 1, cdr)?;
 
