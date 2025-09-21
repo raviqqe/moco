@@ -13,7 +13,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
     pub fn new(heap: H) -> Result<Self, Error> {
         let mut this = Self {
             heap,
-            root: V::from_number(Default::default()),
+            root: Default::default(),
             free: Default::default(),
         };
 
