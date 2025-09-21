@@ -33,6 +33,8 @@ impl<V: Value> Cons<V> {
 
 impl<V: Value> From<V> for Cons<V> {
     fn from(value: V) -> Self {
+        debug_assert!(value.is_pointer());
+
         Self(value)
     }
 }
