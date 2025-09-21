@@ -200,7 +200,7 @@ mod tests {
 
         #[test]
         fn collect_two_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
+            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
 
             let cons = memory
                 .allocate(Default::default(), Default::default())
@@ -214,7 +214,7 @@ mod tests {
 
         #[test]
         fn collect_three_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
+            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
 
             let car = memory
                 .allocate(Default::default(), Default::default())
