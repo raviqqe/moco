@@ -238,6 +238,7 @@ mod tests {
             let cons = memory
                 .allocate(Value64::from_number(1), Value64::from_number(2))
                 .unwrap();
+            memory.set_root(cons.into());
 
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
