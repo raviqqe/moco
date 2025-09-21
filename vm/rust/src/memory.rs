@@ -17,7 +17,6 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
             free: Default::default(),
         };
 
-        // TODO Use garbage collection instead.
         this.collect_garbages()?;
 
         Ok(this)
