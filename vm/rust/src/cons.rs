@@ -43,3 +43,13 @@ impl<V: Value> From<V> for Cons<V> {
         Self(value)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn set_tag() {
+        foo;
+    }
+}
