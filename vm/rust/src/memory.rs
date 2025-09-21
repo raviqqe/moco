@@ -90,7 +90,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
     }
 
     fn mark(&mut self) -> Result<(), Error> {
-        let mut previous = V::zero();
+        let mut previous = V::default();
         let mut current = self.root;
 
         loop {
@@ -117,7 +117,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
     }
 
     fn sweep(&mut self) -> Result<(), Error> {
-        self.free = V::zero();
+        self.free = V::default();
 
         for index in (0..self.heap().len()).step_by(2) {
             let value = self.get(index)?;
@@ -150,6 +150,8 @@ mod tests {
     fn allocate() {
         let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
 
-        memory.allocate(Value::zero(), Value::zero()).unwrap();
+        memory
+            .allocate(Default::default(), Default::default())
+            .unwrap();
     }
 }

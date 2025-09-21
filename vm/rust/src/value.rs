@@ -32,23 +32,18 @@ pub trait Value:
 
     /// Returns `true` if a value is marked.
     fn is_marked(self) -> bool;
-
-    /// Returns a zero.
-    fn zero() -> Self {
-        Self::from_number(Default::default())
-    }
 }
 
 /// A 16-bit value.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value16(u16);
 
 /// A 32-bit value.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value32(u32);
 
 /// A 64-bit value.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value64(u64);
 
 macro_rules! impl_value {
@@ -96,6 +91,12 @@ macro_rules! impl_value {
         impl From<Cons<$value>> for $value {
             fn from(cons: Cons<$value>) -> $value {
                 cons.to_value()
+            }
+        }
+
+        impl Default for $value {
+            fn default() -> Self {
+                Self::from_number(0)
             }
         }
     };
