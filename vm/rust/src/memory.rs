@@ -155,6 +155,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
 
             if value.is_marked() {
                 self.set(index, value.mark(false))?;
+                self.set(index + 1, self.get(index + 1)?.mark(false))?;
             } else {
                 self.set(index + 1, self.free)?;
                 self.free = Cons::new(index).into();
