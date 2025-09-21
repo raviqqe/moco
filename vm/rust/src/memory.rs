@@ -192,6 +192,7 @@ mod tests {
             let cons = memory
                 .allocate(Default::default(), Default::default())
                 .unwrap();
+
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
@@ -206,6 +207,7 @@ mod tests {
                 .allocate(Default::default(), Default::default())
                 .unwrap();
             let cons = memory.allocate(Default::default(), cons.into()).unwrap();
+
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
@@ -223,6 +225,7 @@ mod tests {
                 .allocate(Default::default(), Default::default())
                 .unwrap();
             let cons = memory.allocate(car.into(), cdr.into()).unwrap();
+
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
