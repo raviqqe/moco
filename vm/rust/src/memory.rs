@@ -163,7 +163,7 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         }
 
         for index in 0..self.heap().len() {
-            assert!(!self.get(index)?.is_marked());
+            debug_assert!(!self.get(index)?.is_marked());
         }
 
         Ok(())
