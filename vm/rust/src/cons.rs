@@ -47,9 +47,11 @@ impl<V: Value> From<V> for Cons<V> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::Value64;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn set_tag() {
-        foo;
+        assert_eq!(Cons::<Value64>::new(0).set_tag(42).tag(), 42);
     }
 }
