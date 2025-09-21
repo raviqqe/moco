@@ -1,8 +1,11 @@
-use crate::{Integer, cons::Cons};
+use crate::Integer;
+use crate::cons::Cons;
 use core::fmt::Debug;
 
 /// A value.
-pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
+pub trait Value:
+    Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord + From<Cons<Self>>
+{
     /// A number.
     type Number: Integer;
 
@@ -16,7 +19,7 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
     fn to_number(self) -> Self::Number;
 
     /// Converts a pointer to a value.
-    fn from_pointer(cons: Self::Pointer) -> Self;
+    fn from_pointer(pointer: Self::Pointer) -> Self;
 
     /// Converts a value to a pointer.
     fn to_pointer(self) -> Self::Pointer;
@@ -29,28 +32,18 @@ pub trait Value: Clone + Copy + Default + PartialEq + Eq + PartialOrd + Ord {
 
     /// Returns `true` if a value is marked.
     fn is_marked(self) -> bool;
-
-    /// Converts a value to a cons.
-    fn to_cons(self) -> Cons<Self> {
-        Cons::from_value(self)
-    }
-
-    /// Converts a value to a cons.
-    fn from_cons(cons: Cons<Self>) -> Self {
-        cons.to_value()
-    }
 }
 
 /// A 16-bit value.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value16(u16);
 
 /// A 32-bit value.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value32(u32);
 
 /// A 64-bit value.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value64(u64);
 
 macro_rules! impl_value {
@@ -94,6 +87,18 @@ macro_rules! impl_value {
                 self.0 & 0b10 != 0
             }
         }
+
+        impl From<Cons<$value>> for $value {
+            fn from(cons: Cons<$value>) -> $value {
+                cons.to_value()
+            }
+        }
+
+        impl Default for $value {
+            fn default() -> Self {
+                Self::from_number(0)
+            }
+        }
     };
 }
 
@@ -125,6 +130,11 @@ mod tests {
                         size_of::<<$value as Value>::Number>(),
                         size_of::<<$value as Value>::Pointer>()
                     );
+                }
+
+                #[test]
+                fn zero() {
+                    assert_eq!(from_number(0), Default::default());
                 }
 
                 #[test]

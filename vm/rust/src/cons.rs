@@ -4,13 +4,14 @@ use crate::{Value, integer::Integer};
 pub type Tag = u8;
 
 /// A cons pointer.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Cons<V>(V);
 
 impl<V: Value> Cons<V> {
     /// Creates a cons pointer.
-    pub fn new(index: V::Pointer, tag: Tag) -> Self {
+    pub fn new(index: usize) -> Self {
         Self(V::from_pointer(V::Pointer::from_usize(
-            (index.to_usize() << Tag::BITS) | tag.to_usize(),
+            index.to_usize() << Tag::BITS,
         )))
     }
 
@@ -24,13 +25,21 @@ impl<V: Value> Cons<V> {
         self.0.to_pointer().to_usize() as _
     }
 
-    /// Converts a value to a cons pointer.
-    pub const fn from_value(value: V) -> Self {
-        Self(value)
+    /// Sets a tag.
+    pub fn set_tag(self, tag: Tag) -> Self {
+        Self(V::from_pointer(self.0.to_pointer() | V::Pointer::from(tag)))
     }
 
     /// Converts a cons pointer to a value.
     pub const fn to_value(self) -> V {
         self.0
+    }
+}
+
+impl<V: Value> From<V> for Cons<V> {
+    fn from(value: V) -> Self {
+        debug_assert!(value.is_pointer());
+
+        Self(value)
     }
 }
