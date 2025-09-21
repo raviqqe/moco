@@ -4,16 +4,22 @@ use core::fmt::Debug;
 
 /// A value.
 pub trait Value:
-    Clone + Copy + Debug + Default + PartialEq + Eq + PartialOrd + Ord + From<Cons<Self>>
+    Clone
+    + Copy
+    + Debug
+    + Default
+    + PartialEq
+    + Eq
+    + PartialOrd
+    + Ord
+    + From<Cons<Self>>
+    + From<Self::Number>
 {
     /// A number.
     type Number: Integer;
 
     /// A pointer.
     type Pointer: Integer;
-
-    /// Converts a number to a value.
-    fn from_number(number: Self::Number) -> Self;
 
     /// Converts a value to a number.
     fn to_number(self) -> Self::Number;
@@ -53,11 +59,6 @@ macro_rules! impl_value {
             type Pointer = $pointer;
 
             #[inline]
-            fn from_number(number: Self::Number) -> Self {
-                Self(((number << 2) | 1) as _)
-            }
-
-            #[inline]
             fn to_number(self) -> Self::Number {
                 self.0 as Self::Number >> 2
             }
@@ -88,6 +89,12 @@ macro_rules! impl_value {
             }
         }
 
+        impl From<$number> for $value {
+            fn from(number: $number) -> $value {
+                Self(((number << 2) | 1) as _)
+            }
+        }
+
         impl From<Cons<$value>> for $value {
             fn from(cons: Cons<$value>) -> $value {
                 cons.to_value()
@@ -96,7 +103,7 @@ macro_rules! impl_value {
 
         impl Default for $value {
             fn default() -> Self {
-                Self::from_number(0)
+                0.into()
             }
         }
     };
@@ -117,7 +124,7 @@ mod tests {
                 use core::mem::size_of;
 
                 fn from_number(number: <$value as Value>::Number) -> $value {
-                    <$value as Value>::from_number(number)
+                    number.into()
                 }
 
                 fn from_pointer(pointer: <$value as Value>::Pointer) -> $value {
