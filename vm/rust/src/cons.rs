@@ -3,12 +3,12 @@ use crate::{Value, integer::Integer};
 /// A tag.
 pub type Tag = u8;
 
-/// A cons pointer.
+/// A cons.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Cons<V>(V);
 
 impl<V: Value> Cons<V> {
-    /// Creates a cons pointer.
+    /// Creates a cons.
     pub fn new(index: usize) -> Self {
         Self(V::from_pointer(V::Pointer::from_usize(index) << Tag::BITS))
     }
@@ -26,21 +26,19 @@ impl<V: Value> Cons<V> {
     /// Sets an index.
     pub fn set_index(self, index: usize) -> Self {
         Self(self.0.set_pointer(
-            self.0.to_pointer() & V::Pointer::from(Tag::MAX)
-                | (V::Pointer::from_usize(index) << Tag::BITS),
+            self.0.to_pointer() & Tag::MAX.into() | (V::Pointer::from_usize(index) << Tag::BITS),
         ))
     }
 
     /// Sets a tag.
     pub fn set_tag(self, tag: Tag) -> Self {
         Self(
-            self.0.set_pointer(
-                self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | V::Pointer::from(tag),
-            ),
+            self.0
+                .set_pointer(self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | tag.into()),
         )
     }
 
-    /// Converts a cons pointer to a value.
+    /// Converts a cons to a value.
     pub const fn to_value(self) -> V {
         self.0
     }
@@ -59,6 +57,11 @@ mod tests {
     use super::*;
     use crate::Value64;
     use pretty_assertions::assert_eq;
+
+    #[test]
+    fn create() {
+        assert_eq!(Cons::<Value64>::new(42).index(), 42);
+    }
 
     #[test]
     fn set_index() {
