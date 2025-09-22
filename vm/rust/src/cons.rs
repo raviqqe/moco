@@ -26,17 +26,15 @@ impl<V: Value> Cons<V> {
     /// Sets an index.
     pub fn set_index(self, index: usize) -> Self {
         Self(self.0.set_pointer(
-            self.0.to_pointer() & V::Pointer::from(Tag::MAX)
-                | (V::Pointer::from_usize(index) << Tag::BITS),
+            self.0.to_pointer() & Tag::MAX.into() | (V::Pointer::from_usize(index) << Tag::BITS),
         ))
     }
 
     /// Sets a tag.
     pub fn set_tag(self, tag: Tag) -> Self {
         Self(
-            self.0.set_pointer(
-                self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | V::Pointer::from(tag),
-            ),
+            self.0
+                .set_pointer(self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | tag.into()),
         )
     }
 
