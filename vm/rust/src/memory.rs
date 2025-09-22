@@ -170,20 +170,18 @@ mod tests {
     const HEAP_SIZE: usize = 1 << 10;
 
     fn assert_equal_values<V: Value + Hash, const N: usize>(
-        x_memory: &Memory<V, [V; N]>,
-        y_memory: &Memory<V, [V; N]>,
+        memory: &Memory<V, [V; N]>,
         x: V,
         y: V,
     ) {
         let mut values = Default::default();
 
-        assert_recursive_equal_values(&mut values, x_memory, y_memory, x, y)
+        assert_recursive_equal_values(&mut values, memory, x, y)
     }
 
     fn assert_recursive_equal_values<V: Value + Hash, const N: usize>(
         values: &mut HashSet<V>,
-        x_memory: &Memory<V, [V; N]>,
-        y_memory: &Memory<V, [V; N]>,
+        memory: &Memory<V, [V; N]>,
         x: V,
         y: V,
     ) {
@@ -201,18 +199,16 @@ mod tests {
 
             assert_recursive_equal_values(
                 values,
-                x_memory,
-                y_memory,
-                x_memory.get(x.index()).unwrap(),
-                y_memory.get(y.index()).unwrap(),
+                memory,
+                memory.get(x.index()).unwrap(),
+                memory.get(y.index()).unwrap(),
             );
 
             assert_recursive_equal_values(
                 values,
-                x_memory,
-                y_memory,
-                x_memory.get(x.index() + 1).unwrap(),
-                y_memory.get(y.index() + 1).unwrap(),
+                memory,
+                memory.get(x.index() + 1).unwrap(),
+                memory.get(y.index() + 1).unwrap(),
             );
         } else {
             assert_eq!(x, y)
@@ -231,11 +227,14 @@ mod tests {
         fn allocate_cons_cell() {
             let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
 
-            let cons = memory
+            let x = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+            let y = memory
                 .allocate(Default::default(), Default::default())
                 .unwrap();
 
-            assert_equal_values(&memory, &memory, cons.into(), cons.into());
+            assert_equal_values(&memory, x.into(), y.into());
         }
 
         #[test]
@@ -245,9 +244,14 @@ mod tests {
             let cons = memory
                 .allocate(Default::default(), Default::default())
                 .unwrap();
-            let cons = memory.allocate(Default::default(), cons.into()).unwrap();
+            let x = memory.allocate(Default::default(), cons.into()).unwrap();
 
-            assert_equal_values(&memory, &memory, cons.into(), cons.into());
+            let cons = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+            let y = memory.allocate(Default::default(), cons.into()).unwrap();
+
+            assert_equal_values(&memory, x.into(), y.into());
         }
 
         #[test]
@@ -260,14 +264,73 @@ mod tests {
             let cdr = memory
                 .allocate(Default::default(), Default::default())
                 .unwrap();
-            let cons = memory.allocate(car.into(), cdr.into()).unwrap();
+            let x = memory.allocate(car.into(), cdr.into()).unwrap();
 
-            assert_equal_values(&memory, &memory, cons.into(), cons.into());
+            let car = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+            let cdr = memory
+                .allocate(Default::default(), Default::default())
+                .unwrap();
+            let y = memory.allocate(car.into(), cdr.into()).unwrap();
+
+            assert_equal_values(&memory, x.into(), y.into());
         }
     }
 
     mod garbage_collection {
         use super::*;
+        use pretty_assertions::assert_eq;
+
+        fn assert_equal_values<V: Value + Hash, const N: usize>(
+            x_memory: &Memory<V, [V; N]>,
+            y_memory: &Memory<V, [V; N]>,
+            x: V,
+            y: V,
+        ) {
+            let mut values = Default::default();
+
+            assert_recursive_equal_values(&mut values, x_memory, y_memory, x, y)
+        }
+
+        fn assert_recursive_equal_values<V: Value + Hash, const N: usize>(
+            values: &mut HashSet<V>,
+            x_memory: &Memory<V, [V; N]>,
+            y_memory: &Memory<V, [V; N]>,
+            x: V,
+            y: V,
+        ) {
+            assert_eq!(x.is_pointer(), y.is_pointer());
+
+            if x.is_pointer() && !values.contains(&x) {
+                assert_eq!(x.is_marked(), y.is_marked());
+
+                let x = Cons::from(x);
+                let y = Cons::from(y);
+
+                assert_eq!(x.tag(), y.tag());
+
+                values.insert(x.into());
+
+                assert_recursive_equal_values(
+                    values,
+                    x_memory,
+                    y_memory,
+                    x_memory.get(x.index()).unwrap(),
+                    y_memory.get(y.index()).unwrap(),
+                );
+
+                assert_recursive_equal_values(
+                    values,
+                    x_memory,
+                    y_memory,
+                    x_memory.get(x.index() + 1).unwrap(),
+                    y_memory.get(y.index() + 1).unwrap(),
+                );
+            } else {
+                assert_eq!(x, y)
+            }
+        }
 
         #[test]
         fn collect_cons() {
