@@ -169,6 +169,21 @@ mod tests {
 
     const HEAP_SIZE: usize = 1 << 10;
 
+    fn assert_free_list<V: Value + Hash, const N: usize>(
+        memory: &Memory<V, [V; N]>,
+        allocations: usize,
+    ) {
+        let mut free = memory.free;
+        let mut length = 0;
+
+        while free.is_pointer() {
+            free = memory.get(Cons::from(free).index() + 1).unwrap();
+            length += 1;
+        }
+
+        assert_eq!(length, HEAP_SIZE / 2 - allocations);
+    }
+
     fn assert_equal_values<V: Value + Hash, const N: usize>(
         memory: &Memory<V, [V; N]>,
         x: V,
@@ -231,6 +246,7 @@ mod tests {
                 .unwrap();
 
             assert_equal_values(&memory, x.into(), y.into());
+            assert_free_list(&memory, 2);
         }
 
         #[test]
@@ -249,6 +265,7 @@ mod tests {
             let y = memory.allocate(Default::default(), cons.into()).unwrap();
 
             assert_equal_values(&memory, x.into(), y.into());
+            assert_free_list(&memory, 4);
         }
 
         #[test]
@@ -273,6 +290,7 @@ mod tests {
             let y = memory.allocate(car.into(), cdr.into()).unwrap();
 
             assert_equal_values(&memory, x.into(), y.into());
+            assert_free_list(&memory, 6);
         }
     }
 
@@ -324,6 +342,7 @@ mod tests {
             memory.collect_garbages().unwrap();
 
             assert_value(&memory, &old_memory, cons.into());
+            assert_free_list(&memory, 1);
         }
 
         #[test]
@@ -339,6 +358,7 @@ mod tests {
             memory.collect_garbages().unwrap();
 
             assert_value(&memory, &old_memory, cons.into());
+            assert_free_list(&memory, 2);
         }
 
         #[test]
@@ -355,6 +375,7 @@ mod tests {
             memory.collect_garbages().unwrap();
 
             assert_value(&memory, &old_memory, cons.into());
+            assert_free_list(&memory, 3);
         }
 
         #[test]
@@ -370,6 +391,7 @@ mod tests {
             memory.collect_garbages().unwrap();
 
             assert_value(&memory, &old_memory, cons.into());
+            assert_free_list(&memory, 1);
         }
 
         #[test]
@@ -385,6 +407,7 @@ mod tests {
             memory.collect_garbages().unwrap();
 
             assert_value(&memory, &old_memory, cons.into());
+            assert_free_list(&memory, 1);
         }
     }
 }
