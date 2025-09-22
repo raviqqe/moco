@@ -1,5 +1,6 @@
 use crate::{Error, Heap, Memory, Value};
 
+/// A virtual machine.
 pub struct Vm<V, H> {
     memory: Memory<V, H>,
 }
