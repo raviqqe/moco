@@ -45,7 +45,7 @@ impl<V: Value> Cons<V> {
 
     /// Converts a cons to a value.
     #[inline]
-    pub const fn to_value(self) -> V {
+    pub(crate) const fn to_value(self) -> V {
         self.0
     }
 }
