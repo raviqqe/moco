@@ -22,14 +22,14 @@ pub trait Value:
     /// A pointer.
     type Pointer: Integer;
 
-    /// Sets a pointer.
-    fn set_pointer(self, pointer: Self::Pointer) -> Self;
-
     /// Converts a pointer to a value.
     fn from_pointer(pointer: Self::Pointer) -> Self;
 
     /// Converts a value to a pointer.
     fn to_pointer(self) -> Self::Pointer;
+
+    /// Sets a pointer.
+    fn set_pointer(self, pointer: Self::Pointer) -> Self;
 
     /// Checks if a value is a pointer.
     fn is_pointer(self) -> bool;
@@ -65,13 +65,13 @@ macro_rules! impl_value {
             }
 
             #[inline]
-            fn set_pointer(self, pointer: Self::Pointer) -> Self {
-                Self(self.0 & 0b11 | (pointer << 2))
+            fn to_pointer(self) -> Self::Pointer {
+                self.0 >> 2
             }
 
             #[inline]
-            fn to_pointer(self) -> Self::Pointer {
-                self.0 >> 2
+            fn set_pointer(self, pointer: Self::Pointer) -> Self {
+                Self(self.0 & 0b11 | (pointer << 2))
             }
 
             #[inline]
