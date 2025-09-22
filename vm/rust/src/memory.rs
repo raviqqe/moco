@@ -372,7 +372,7 @@ mod tests {
                 Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let cons = memory.allocate(1.into(), 2.into()).unwrap();
-            let cons = memory.allocate(3.into(), cons.into()).unwrap();
+            let cons = memory.allocate_unchecked(3.into(), cons.into()).unwrap();
             memory.set_root(cons.into());
 
             let old_memory = memory.clone();
@@ -402,7 +402,7 @@ mod tests {
 
             let car = memory.allocate(1.into(), 2.into()).unwrap();
             let cdr = memory.allocate_unchecked(3.into(), 4.into()).unwrap();
-            let cons = memory.allocate(car.into(), cdr.into()).unwrap();
+            let cons = memory.allocate_unchecked(car.into(), cdr.into()).unwrap();
             memory.set_root(cons.into());
 
             let old_memory = memory.clone();
