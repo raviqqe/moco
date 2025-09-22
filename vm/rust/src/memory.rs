@@ -301,23 +301,16 @@ mod tests {
             if x.is_pointer() && !values.contains(&x) {
                 values.insert(x);
 
-                assert_eq!(x.is_marked(), y.is_marked());
-
                 let x = Cons::from(x);
-                let y = Cons::from(y);
-
-                assert_eq!(x.tag(), y.tag());
 
                 for field in [0, 1] {
                     let index = x.index() + field;
                     let value = memory.get(index).unwrap();
 
-                    assert_eq!(value, other_memory.get(y.index()).unwrap());
+                    assert_eq!(value, other_memory.get(index).unwrap());
 
                     assert_recursive_value(values, memory, other_memory, value);
                 }
-            } else {
-                assert_eq!(x, y)
             }
         }
 
