@@ -167,7 +167,7 @@ mod tests {
     use pretty_assertions::assert_eq;
     use std::collections::HashSet;
 
-    const HEAP_SIZE: usize = 1 << 10;
+    const HEAP_SIZE: usize = 1 << 8;
 
     fn assert_free_list<V: Value + Hash, const N: usize>(
         memory: &Memory<V, [V; N]>,
