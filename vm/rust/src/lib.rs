@@ -10,6 +10,7 @@ extern crate std;
 mod cons;
 mod error;
 mod heap;
+mod instruction;
 mod integer;
 mod memory;
 mod value;
