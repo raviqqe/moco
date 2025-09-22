@@ -29,11 +29,15 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
         Ok(())
     }
 
-    fn index(&self, address: usize) -> Result<usize, Error> {
+    fn index(&self, mut address: usize) -> Result<usize, Error> {
         let mut index = Cons::from(self.memory.root()).index();
 
-        while address != 1 {
-            index = Cons::from(self.memory.get(index + (address & 1))?).index();
+        while {
+            index += address & 1;
+            address >>= 1;
+            address != 1
+        } {
+            Cons::from(self.memory.get(index)?).index();
         }
 
         Ok(index)
