@@ -33,7 +33,7 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
         let index = Cons::new(self.root).index();
 
         while address != 1 {
-            let foo = self.memory.get(index + (address & 1))?;
+            index = self.memory.get(index + (address & 1))?;
         }
 
         Ok(index)
