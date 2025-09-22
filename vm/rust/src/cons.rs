@@ -15,7 +15,7 @@ impl<V: Value> Cons<V> {
 
     /// Returns an index.
     pub fn index(self) -> usize {
-        self.0.to_pointer().to_usize() >> Tag::BITS as usize
+        (self.0.to_pointer() >> Tag::BITS).to_usize()
     }
 
     /// Returns a tag.
