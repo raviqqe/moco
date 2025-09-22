@@ -1,6 +1,7 @@
 use crate::{Cons, error::Error, heap::Heap, value::Value};
 
 /// A memory on a virtual machine.
+#[derive(Debug, Default)]
 #[cfg_attr(test, derive(Clone))]
 pub struct Memory<V: Value, H: Heap<V>> {
     heap: H,
@@ -69,6 +70,11 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
             self.collect_garbages()?;
         }
 
+        self.allocate_unchecked(car, cdr)
+    }
+
+    #[inline]
+    fn allocate_unchecked(&mut self, car: V, cdr: V) -> Result<Cons<V>, Error> {
         let cons = Cons::from(self.free);
 
         self.free = self.get(cons.index() + 1)?;
@@ -166,29 +172,44 @@ mod tests {
     use pretty_assertions::assert_eq;
     use std::collections::HashSet;
 
-    const HEAP_SIZE: usize = 1 << 10;
+    const HEAP_SIZE: usize = 1 << 8;
+
+    fn assert_free_list<V: Value + Hash, const N: usize>(
+        memory: &Memory<V, [V; N]>,
+        allocations: usize,
+    ) {
+        let mut free = memory.free;
+        let mut length = 0;
+
+        while free.is_pointer() {
+            free = memory.get(Cons::from(free).index() + 1).unwrap();
+            length += 1;
+        }
+
+        assert_eq!(length, HEAP_SIZE / 2 - allocations);
+    }
 
     fn assert_equal_values<V: Value + Hash, const N: usize>(
-        x_memory: &Memory<V, [V; N]>,
-        y_memory: &Memory<V, [V; N]>,
+        memory: &Memory<V, [V; N]>,
         x: V,
         y: V,
     ) {
         let mut values = Default::default();
 
-        assert_recursive_equal_values(&mut values, x_memory, y_memory, x, y)
+        assert_recursive_equal_values(&mut values, memory, x, y)
     }
 
     fn assert_recursive_equal_values<V: Value + Hash, const N: usize>(
         values: &mut HashSet<V>,
-        x_memory: &Memory<V, [V; N]>,
-        y_memory: &Memory<V, [V; N]>,
+        memory: &Memory<V, [V; N]>,
         x: V,
         y: V,
     ) {
         assert_eq!(x.is_pointer(), y.is_pointer());
 
         if x.is_pointer() && !values.contains(&x) {
+            values.insert(x);
+
             assert_eq!(x.is_marked(), y.is_marked());
 
             let x = Cons::from(x);
@@ -196,23 +217,14 @@ mod tests {
 
             assert_eq!(x.tag(), y.tag());
 
-            values.insert(x.into());
-
-            assert_recursive_equal_values(
-                values,
-                x_memory,
-                y_memory,
-                x_memory.get(x.index()).unwrap(),
-                y_memory.get(y.index()).unwrap(),
-            );
-
-            assert_recursive_equal_values(
-                values,
-                x_memory,
-                y_memory,
-                x_memory.get(x.index() + 1).unwrap(),
-                y_memory.get(y.index() + 1).unwrap(),
-            );
+            for field in [0, 1] {
+                assert_recursive_equal_values(
+                    values,
+                    memory,
+                    memory.get(x.index() + field).unwrap(),
+                    memory.get(y.index() + field).unwrap(),
+                );
+            }
         } else {
             assert_eq!(x, y)
         }
@@ -228,49 +240,109 @@ mod tests {
 
         #[test]
         fn allocate_cons_cell() {
-            let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
-            let cons = memory
+            let x = memory
                 .allocate(Default::default(), Default::default())
                 .unwrap();
+            let y = memory
+                .allocate_unchecked(Default::default(), Default::default())
+                .unwrap();
 
-            assert_equal_values(&memory, &memory, cons.into(), cons.into());
+            assert_equal_values(&memory, x.into(), y.into());
+            assert_free_list(&memory, 2);
         }
 
         #[test]
         fn allocate_two_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let cons = memory
                 .allocate(Default::default(), Default::default())
                 .unwrap();
-            let cons = memory.allocate(Default::default(), cons.into()).unwrap();
+            let x = memory
+                .allocate_unchecked(Default::default(), cons.into())
+                .unwrap();
 
-            assert_equal_values(&memory, &memory, cons.into(), cons.into());
+            let cons = memory
+                .allocate_unchecked(Default::default(), Default::default())
+                .unwrap();
+            let y = memory
+                .allocate_unchecked(Default::default(), cons.into())
+                .unwrap();
+
+            assert_equal_values(&memory, x.into(), y.into());
+            assert_free_list(&memory, 4);
         }
 
         #[test]
         fn allocate_three_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let car = memory
                 .allocate(Default::default(), Default::default())
                 .unwrap();
             let cdr = memory
-                .allocate(Default::default(), Default::default())
+                .allocate_unchecked(Default::default(), Default::default())
                 .unwrap();
-            let cons = memory.allocate(car.into(), cdr.into()).unwrap();
+            let x = memory.allocate_unchecked(car.into(), cdr.into()).unwrap();
 
-            assert_equal_values(&memory, &memory, cons.into(), cons.into());
+            let car = memory
+                .allocate_unchecked(Default::default(), Default::default())
+                .unwrap();
+            let cdr = memory
+                .allocate_unchecked(Default::default(), Default::default())
+                .unwrap();
+            let y = memory.allocate_unchecked(car.into(), cdr.into()).unwrap();
+
+            assert_equal_values(&memory, x.into(), y.into());
+            assert_free_list(&memory, 6);
         }
     }
 
     mod garbage_collection {
         use super::*;
+        use pretty_assertions::assert_eq;
+
+        fn assert_value<V: Value + Hash, const N: usize>(
+            memory: &Memory<V, [V; N]>,
+            other_memory: &Memory<V, [V; N]>,
+            x: V,
+        ) {
+            let mut values = Default::default();
+
+            assert_recursive_value(&mut values, memory, other_memory, x)
+        }
+
+        fn assert_recursive_value<V: Value + Hash, const N: usize>(
+            values: &mut HashSet<V>,
+            memory: &Memory<V, [V; N]>,
+            other_memory: &Memory<V, [V; N]>,
+            x: V,
+        ) {
+            if x.is_pointer() && !values.contains(&x) {
+                values.insert(x);
+
+                let x = Cons::from(x);
+
+                for field in [0, 1] {
+                    let index = x.index() + field;
+                    let value = memory.get(index).unwrap();
+
+                    assert_eq!(value, other_memory.get(index).unwrap());
+
+                    assert_recursive_value(values, memory, other_memory, value);
+                }
+            }
+        }
 
         #[test]
-        fn collect_cons() {
-            let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
+        fn keep_cons() {
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let cons = memory.allocate(1.into(), 2.into()).unwrap();
             memory.set_root(cons.into());
@@ -278,41 +350,86 @@ mod tests {
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+            assert_value(&memory, &old_memory, cons.into());
+            assert_free_list(&memory, 1);
+        }
+
+        #[test]
+        fn collect_cons() {
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
+
+            memory.allocate(1.into(), 2.into()).unwrap();
+
+            memory.collect_garbages().unwrap();
+
+            assert_free_list(&memory, 0);
+        }
+
+        #[test]
+        fn keep_two_cons_cells() {
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory.allocate(1.into(), 2.into()).unwrap();
+            let cons = memory.allocate_unchecked(3.into(), cons.into()).unwrap();
+            memory.set_root(cons.into());
+
+            let old_memory = memory.clone();
+            memory.collect_garbages().unwrap();
+
+            assert_value(&memory, &old_memory, cons.into());
+            assert_free_list(&memory, 2);
         }
 
         #[test]
         fn collect_two_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let cons = memory.allocate(1.into(), 2.into()).unwrap();
-            let cons = memory.allocate(3.into(), cons.into()).unwrap();
+            memory.allocate(3.into(), cons.into()).unwrap();
+
+            memory.collect_garbages().unwrap();
+
+            assert_free_list(&memory, 0);
+        }
+
+        #[test]
+        fn keep_three_cons_cells() {
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
+
+            let car = memory.allocate(1.into(), 2.into()).unwrap();
+            let cdr = memory.allocate_unchecked(3.into(), 4.into()).unwrap();
+            let cons = memory.allocate_unchecked(car.into(), cdr.into()).unwrap();
             memory.set_root(cons.into());
 
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+            assert_value(&memory, &old_memory, cons.into());
+            assert_free_list(&memory, 3);
         }
 
         #[test]
         fn collect_three_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let car = memory.allocate(1.into(), 2.into()).unwrap();
             let cdr = memory.allocate(3.into(), 4.into()).unwrap();
-            let cons = memory.allocate(car.into(), cdr.into()).unwrap();
-            memory.set_root(cons.into());
+            memory.allocate(car.into(), cdr.into()).unwrap();
 
-            let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+            assert_free_list(&memory, 0);
         }
 
         #[test]
-        fn collect_recursive_cons_in_car() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+        fn keep_recursive_cons_in_car() {
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let cons = memory.allocate(Default::default(), 42.into()).unwrap();
             memory.set(cons.index(), cons.into()).unwrap();
@@ -321,12 +438,27 @@ mod tests {
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+            assert_value(&memory, &old_memory, cons.into());
+            assert_free_list(&memory, 1);
         }
 
         #[test]
-        fn collect_recursive_cons_in_cdr() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+        fn collect_recursive_cons_in_car() {
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory.allocate(Default::default(), 42.into()).unwrap();
+            memory.set(cons.index(), cons.into()).unwrap();
+
+            memory.collect_garbages().unwrap();
+
+            assert_free_list(&memory, 0);
+        }
+
+        #[test]
+        fn keep_recursive_cons_in_cdr() {
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let cons = memory.allocate(42.into(), Default::default()).unwrap();
             memory.set(cons.index() + 1, cons.into()).unwrap();
@@ -335,7 +467,21 @@ mod tests {
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+            assert_value(&memory, &old_memory, cons.into());
+            assert_free_list(&memory, 1);
+        }
+
+        #[test]
+        fn collect_recursive_cons_in_cdr() {
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory.allocate(42.into(), Default::default()).unwrap();
+            memory.set(cons.index() + 1, cons.into()).unwrap();
+
+            memory.collect_garbages().unwrap();
+
+            assert_free_list(&memory, 0);
         }
     }
 }
