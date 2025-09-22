@@ -197,19 +197,14 @@ mod tests {
 
             assert_eq!(x.tag(), y.tag());
 
-            assert_recursive_equal_values(
-                values,
-                memory,
-                memory.get(x.index()).unwrap(),
-                memory.get(y.index()).unwrap(),
-            );
-
-            assert_recursive_equal_values(
-                values,
-                memory,
-                memory.get(x.index() + 1).unwrap(),
-                memory.get(y.index() + 1).unwrap(),
-            );
+            for field in [0, 1] {
+                assert_recursive_equal_values(
+                    values,
+                    memory,
+                    memory.get(x.index() + field).unwrap(),
+                    memory.get(y.index() + field).unwrap(),
+                );
+            }
         } else {
             assert_eq!(x, y)
         }
