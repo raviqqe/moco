@@ -29,18 +29,19 @@ impl<V: Value> Cons<V> {
     /// Sets an index.
     #[inline]
     pub fn set_index(self, index: usize) -> Self {
-        Self(self.0.set_pointer(
+        self.set_pointer(
             self.0.to_pointer() & Tag::MAX.into() | (V::Pointer::from_usize(index) << Tag::BITS),
-        ))
+        )
     }
 
     /// Sets a tag.
     #[inline]
     pub fn set_tag(self, tag: Tag) -> Self {
-        Self(
-            self.0
-                .set_pointer(self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | tag.into()),
-        )
+        self.set_pointer(self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | tag.into())
+    }
+
+    fn set_pointer(self, pointer: V::Pointer) -> Self {
+        Self(self.0.set_pointer(pointer))
     }
 
     /// Converts a cons to a value.
