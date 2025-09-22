@@ -374,6 +374,19 @@ mod tests {
         }
 
         #[test]
+        fn collect_two_cons_cells() {
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory.allocate(1.into(), 2.into()).unwrap();
+            memory.allocate(3.into(), cons.into()).unwrap();
+
+            memory.collect_garbages().unwrap();
+
+            assert_free_list(&memory, 0);
+        }
+
+        #[test]
         fn keep_three_cons_cells() {
             let mut memory =
                 Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
