@@ -331,7 +331,7 @@ mod tests {
         }
 
         #[test]
-        fn collect_cons() {
+        fn keep_cons() {
             let mut memory =
                 Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
@@ -346,7 +346,7 @@ mod tests {
         }
 
         #[test]
-        fn collect_two_cons_cells() {
+        fn keep_two_cons_cells() {
             let mut memory =
                 Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
@@ -362,7 +362,7 @@ mod tests {
         }
 
         #[test]
-        fn collect_three_cons_cells() {
+        fn keep_three_cons_cells() {
             let mut memory =
                 Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
@@ -379,7 +379,7 @@ mod tests {
         }
 
         #[test]
-        fn collect_recursive_cons_in_car() {
+        fn keep_recursive_cons_in_car() {
             let mut memory =
                 Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
@@ -395,7 +395,7 @@ mod tests {
         }
 
         #[test]
-        fn collect_recursive_cons_in_cdr() {
+        fn keep_recursive_cons_in_cdr() {
             let mut memory =
                 Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
@@ -408,6 +408,32 @@ mod tests {
 
             assert_value(&memory, &old_memory, cons.into());
             assert_free_list(&memory, 1);
+        }
+
+        #[test]
+        fn collect_recursive_cons_in_car() {
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory.allocate(Default::default(), 42.into()).unwrap();
+            memory.set(cons.index(), cons.into()).unwrap();
+
+            memory.collect_garbages().unwrap();
+
+            assert_free_list(&memory, 0);
+        }
+
+        #[test]
+        fn collect_recursive_cons_in_cdr() {
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
+
+            let cons = memory.allocate(42.into(), Default::default()).unwrap();
+            memory.set(cons.index() + 1, cons.into()).unwrap();
+
+            memory.collect_garbages().unwrap();
+
+            assert_free_list(&memory, 0);
         }
     }
 }
