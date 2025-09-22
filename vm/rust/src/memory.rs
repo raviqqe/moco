@@ -220,7 +220,8 @@ mod tests {
 
         #[test]
         fn allocate_cons_cell() {
-            let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let x = memory
                 .allocate(Default::default(), Default::default())
@@ -234,7 +235,8 @@ mod tests {
 
         #[test]
         fn allocate_two_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let cons = memory
                 .allocate(Default::default(), Default::default())
@@ -251,7 +253,8 @@ mod tests {
 
         #[test]
         fn allocate_three_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let car = memory
                 .allocate(Default::default(), Default::default())
@@ -311,7 +314,8 @@ mod tests {
 
         #[test]
         fn collect_cons() {
-            let mut memory = Memory::<Value64, [Value64; 2]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let cons = memory.allocate(1.into(), 2.into()).unwrap();
             memory.set_root(cons.into());
@@ -324,7 +328,8 @@ mod tests {
 
         #[test]
         fn collect_two_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let cons = memory.allocate(1.into(), 2.into()).unwrap();
             let cons = memory.allocate(3.into(), cons.into()).unwrap();
@@ -338,7 +343,8 @@ mod tests {
 
         #[test]
         fn collect_three_cons_cells() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let car = memory.allocate(1.into(), 2.into()).unwrap();
             let cdr = memory.allocate(3.into(), 4.into()).unwrap();
@@ -353,7 +359,8 @@ mod tests {
 
         #[test]
         fn collect_recursive_cons_in_car() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let cons = memory.allocate(Default::default(), 42.into()).unwrap();
             memory.set(cons.index(), cons.into()).unwrap();
@@ -367,7 +374,8 @@ mod tests {
 
         #[test]
         fn collect_recursive_cons_in_cdr() {
-            let mut memory = Memory::<Value64, [Value64; 8]>::new([Default::default(); _]).unwrap();
+            let mut memory =
+                Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let cons = memory.allocate(42.into(), Default::default()).unwrap();
             memory.set(cons.index() + 1, cons.into()).unwrap();
