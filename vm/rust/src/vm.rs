@@ -30,7 +30,7 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
     }
 
     fn index(&self, address: usize) -> Result<usize, Error> {
-        let index = Cons::from(self.memory.root()).index();
+        let mut index = Cons::from(self.memory.root()).index();
 
         while address != 1 {
             index = Cons::from(self.memory.get(index + (address & 1))?).index();
