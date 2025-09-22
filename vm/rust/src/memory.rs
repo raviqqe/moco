@@ -283,14 +283,13 @@ mod tests {
         use pretty_assertions::assert_eq;
 
         fn assert_equal_values<V: Value + Hash, const N: usize>(
-            x_memory: &Memory<V, [V; N]>,
-            y_memory: &Memory<V, [V; N]>,
+            memory: &Memory<V, [V; N]>,
+            other_memory: &Memory<V, [V; N]>,
             x: V,
-            y: V,
         ) {
             let mut values = Default::default();
 
-            assert_recursive_equal_values(&mut values, x_memory, y_memory, x, y)
+            assert_recursive_equal_values(&mut values, memory, other_memory, x, y)
         }
 
         fn assert_recursive_equal_values<V: Value + Hash, const N: usize>(
@@ -342,7 +341,7 @@ mod tests {
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+            assert_equal_values(&memory, &old_memory, cons.into());
         }
 
         #[test]
@@ -356,7 +355,7 @@ mod tests {
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+            assert_equal_values(&memory, &old_memory, cons.into());
         }
 
         #[test]
@@ -371,7 +370,7 @@ mod tests {
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+            assert_equal_values(&memory, &old_memory, cons.into());
         }
 
         #[test]
@@ -385,7 +384,7 @@ mod tests {
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+            assert_equal_values(&memory, &old_memory, cons.into());
         }
 
         #[test]
@@ -399,7 +398,7 @@ mod tests {
             let old_memory = memory.clone();
             memory.collect_garbages().unwrap();
 
-            assert_equal_values(&memory, &old_memory, cons.into(), cons.into());
+            assert_equal_values(&memory, &old_memory, cons.into());
         }
     }
 }
