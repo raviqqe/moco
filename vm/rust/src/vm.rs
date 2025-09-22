@@ -20,7 +20,9 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
 
             match Cons::from(instruction).tag() {
                 Instruction::CONS => {}
-                _ => {}
+                instruction => {
+                    debug_assert_eq!(instruction, Instruction::MOVE);
+                }
             }
         }
     }
