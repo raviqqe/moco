@@ -91,24 +91,28 @@ macro_rules! impl_value {
         }
 
         impl From<$number> for $value {
+            #[inline]
             fn from(number: $number) -> $value {
                 Self(((number << 2) | 1) as _)
             }
         }
 
         impl From<$value> for $number {
+            #[inline]
             fn from(value: $value) -> $number {
                 value.0 as $number >> 2
             }
         }
 
         impl From<Cons<$value>> for $value {
+            #[inline]
             fn from(cons: Cons<$value>) -> $value {
                 cons.to_value()
             }
         }
 
         impl Default for $value {
+            #[inline]
             fn default() -> Self {
                 0.into()
             }
