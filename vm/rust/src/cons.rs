@@ -23,11 +23,21 @@ impl<V: Value> Cons<V> {
         self.0.to_pointer().to_usize() as _
     }
 
+    /// Sets an index.
+    pub fn set_index(self, index: usize) -> Self {
+        Self(self.0.set_pointer(
+            self.0.to_pointer() & V::Pointer::from(Tag::MAX)
+                | (V::Pointer::from_usize(index) << Tag::BITS),
+        ))
+    }
+
     /// Sets a tag.
     pub fn set_tag(self, tag: Tag) -> Self {
-        Self(V::from_pointer(
-            self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | V::Pointer::from(tag),
-        ))
+        Self(
+            self.0.set_pointer(
+                self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | V::Pointer::from(tag),
+            ),
+        )
     }
 
     /// Converts a cons pointer to a value.
@@ -49,6 +59,22 @@ mod tests {
     use super::*;
     use crate::Value64;
     use pretty_assertions::assert_eq;
+
+    #[test]
+    fn set_index() {
+        assert_eq!(Cons::<Value64>::new(0).set_index(42).index(), 42);
+    }
+
+    #[test]
+    fn set_index_twice() {
+        assert_eq!(
+            Cons::<Value64>::new(0)
+                .set_index(usize::MAX)
+                .set_index(42)
+                .index(),
+            42
+        );
+    }
 
     #[test]
     fn set_tag() {

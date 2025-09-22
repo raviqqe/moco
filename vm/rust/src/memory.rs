@@ -1,12 +1,5 @@
 use crate::{Cons, error::Error, heap::Heap, value::Value};
 
-macro_rules! trace {
-    ($scope:literal, $data:expr) => {
-        #[cfg(test)]
-        std::println!("{}: {:?}", $scope, $data);
-    };
-}
-
 /// A memory on a virtual machine.
 #[cfg_attr(test, derive(Clone))]
 pub struct Memory<V: Value, H: Heap<V>> {
@@ -105,19 +98,13 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
         let mut previous = V::default();
         let mut current = self.root;
 
-        trace!("gc", "begin");
-
         loop {
-            trace!("gc", (previous, current));
-
             debug_assert!(current.is_pointer());
 
             let cons = Cons::from(current);
             let value = self.get(cons.index())?;
 
             if !value.is_marked() {
-                trace!("gc", "forward");
-
                 if value.is_pointer() {
                     self.set(cons.index(), previous.mark(true))?;
                     previous = current;
@@ -126,26 +113,22 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
                     self.set(cons.index(), value.mark(true))?;
                 }
             } else if cons.index().is_multiple_of(2) {
-                trace!("gc", "cdr");
                 current = Cons::new(cons.index() + 1).into();
             } else if !previous.is_pointer() {
                 break;
             } else {
-                trace!("gc", "backward");
-
                 let previous_cons = Cons::from(previous);
                 let current_cons = Cons::from(current);
                 previous = self.get(previous_cons.index())?;
+
                 self.set(
                     previous_cons.index(),
-                    V::from(Cons::new(current_cons.index() - 1).set_tag(current_cons.tag()))
-                        .mark(true),
+                    V::from(current_cons.set_index(current_cons.index() - 1)).mark(true),
                 )?;
+
                 current = previous_cons.into();
             }
         }
-
-        trace!("gc", "end");
 
         Ok(())
     }
@@ -157,8 +140,10 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
             let value = self.get(index)?;
 
             if value.is_marked() {
-                self.set(index, value.mark(false))?;
-                self.set(index + 1, self.get(index + 1)?.mark(false))?;
+                for field in [0, 1] {
+                    let index = index + field;
+                    self.set(index, self.get(index)?.mark(false))?;
+                }
             } else {
                 self.set(index + 1, self.free)?;
                 self.free = Cons::new(index).into();

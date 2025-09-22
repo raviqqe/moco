@@ -22,6 +22,9 @@ pub trait Value:
     /// A pointer.
     type Pointer: Integer;
 
+    /// Sets a pointer.
+    fn set_pointer(self, pointer: Self::Pointer) -> Self;
+
     /// Converts a pointer to a value.
     fn from_pointer(pointer: Self::Pointer) -> Self;
 
@@ -59,6 +62,11 @@ macro_rules! impl_value {
             #[inline]
             fn from_pointer(pointer: Self::Pointer) -> Self {
                 Self(pointer << 2)
+            }
+
+            #[inline]
+            fn set_pointer(self, pointer: Self::Pointer) -> Self {
+                Self(self.0 & 0b11 | (pointer << 2))
             }
 
             #[inline]
