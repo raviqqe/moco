@@ -13,10 +13,8 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
         })
     }
 
-    /// Runs a virtual machine.
+    /// Runs a program.
     pub fn run(&self, _program: &[u8]) -> Result<(), Error> {
-        foo;
-
         Ok(())
     }
 }
