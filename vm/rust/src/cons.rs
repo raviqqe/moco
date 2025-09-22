@@ -61,6 +61,11 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     #[test]
+    fn create() {
+        assert_eq!(Cons::<Value64>::new(42).index(), 42);
+    }
+
+    #[test]
     fn set_index() {
         assert_eq!(Cons::<Value64>::new(0).set_index(42).index(), 42);
     }
