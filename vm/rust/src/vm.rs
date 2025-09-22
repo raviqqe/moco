@@ -14,7 +14,9 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
     }
 
     /// Runs a program.
-    pub fn run(&self, _program: &[u8]) -> Result<(), Error> {
+    pub fn run(&self, program: &[u8]) -> Result<(), Error> {
+        self.initialize(program)?;
+
         loop {
             let instruction = self.memory.get(self.index(0b101)?)?;
 
@@ -39,5 +41,9 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
         }
 
         Ok(index)
+    }
+
+    fn initialize(&self, _program: &[u8]) -> Result<(), Error> {
+        Ok(())
     }
 }
