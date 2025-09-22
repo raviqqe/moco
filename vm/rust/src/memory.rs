@@ -70,6 +70,11 @@ impl<V: Value, H: Heap<V>> Memory<V, H> {
             self.collect_garbages()?;
         }
 
+        self.allocate_unchecked(car, cdr)
+    }
+
+    #[inline]
+    fn allocate_unchecked(&mut self, car: V, cdr: V) -> Result<Cons<V>, Error> {
         let cons = Cons::from(self.free);
 
         self.free = self.get(cons.index() + 1)?;
@@ -242,7 +247,7 @@ mod tests {
                 .allocate(Default::default(), Default::default())
                 .unwrap();
             let y = memory
-                .allocate(Default::default(), Default::default())
+                .allocate_unchecked(Default::default(), Default::default())
                 .unwrap();
 
             assert_equal_values(&memory, x.into(), y.into());
@@ -257,12 +262,16 @@ mod tests {
             let cons = memory
                 .allocate(Default::default(), Default::default())
                 .unwrap();
-            let x = memory.allocate(Default::default(), cons.into()).unwrap();
+            let x = memory
+                .allocate_unchecked(Default::default(), cons.into())
+                .unwrap();
 
             let cons = memory
-                .allocate(Default::default(), Default::default())
+                .allocate_unchecked(Default::default(), Default::default())
                 .unwrap();
-            let y = memory.allocate(Default::default(), cons.into()).unwrap();
+            let y = memory
+                .allocate_unchecked(Default::default(), cons.into())
+                .unwrap();
 
             assert_equal_values(&memory, x.into(), y.into());
             assert_free_list(&memory, 4);
@@ -277,17 +286,17 @@ mod tests {
                 .allocate(Default::default(), Default::default())
                 .unwrap();
             let cdr = memory
-                .allocate(Default::default(), Default::default())
+                .allocate_unchecked(Default::default(), Default::default())
                 .unwrap();
-            let x = memory.allocate(car.into(), cdr.into()).unwrap();
+            let x = memory.allocate_unchecked(car.into(), cdr.into()).unwrap();
 
             let car = memory
-                .allocate(Default::default(), Default::default())
+                .allocate_unchecked(Default::default(), Default::default())
                 .unwrap();
             let cdr = memory
-                .allocate(Default::default(), Default::default())
+                .allocate_unchecked(Default::default(), Default::default())
                 .unwrap();
-            let y = memory.allocate(car.into(), cdr.into()).unwrap();
+            let y = memory.allocate_unchecked(car.into(), cdr.into()).unwrap();
 
             assert_equal_values(&memory, x.into(), y.into());
             assert_free_list(&memory, 6);
@@ -392,7 +401,7 @@ mod tests {
                 Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
             let car = memory.allocate(1.into(), 2.into()).unwrap();
-            let cdr = memory.allocate(3.into(), 4.into()).unwrap();
+            let cdr = memory.allocate_unchecked(3.into(), 4.into()).unwrap();
             let cons = memory.allocate(car.into(), cdr.into()).unwrap();
             memory.set_root(cons.into());
 
