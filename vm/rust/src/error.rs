@@ -8,6 +8,8 @@ use core::{
 pub enum Error {
     /// Invalid memory access.
     InvalidMemoryAccess,
+    /// Number expected.
+    NumberExpected,
     /// Out of memory.
     OutOfMemory,
 }
@@ -18,6 +20,7 @@ impl Display for Error {
     fn fmt(&self, formatter: &mut Formatter) -> fmt::Result {
         match self {
             Self::InvalidMemoryAccess => write!(formatter, "invalid memory access"),
+            Self::NumberExpected => write!(formatter, "number expected"),
             Self::OutOfMemory => write!(formatter, "out of memory"),
         }
     }

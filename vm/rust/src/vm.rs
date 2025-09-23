@@ -36,10 +36,12 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
 
                         self.memory.set(
                             index,
-                            match operand.to_cons() {
-                                Ok(cons) => cons.into(),
-                                Err(number) => self.memory.get(number.to_usize())?,
-                            },
+                            self.memory.get(
+                                operand
+                                    .to_number()
+                                    .map_err(|_| Error::NumberExpected)?
+                                    .to_usize(),
+                            )?,
                         )?;
                     }
                 }
