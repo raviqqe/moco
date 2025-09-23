@@ -16,11 +16,6 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
         })
     }
 
-    #[cfg(test)]
-    pub(crate) fn memory_mut(&mut self) -> &mut Memory<V, H> {
-        &mut self.memory
-    }
-
     /// Runs a program.
     pub fn run(&self, program: &[u8]) -> Result<(), Error> {
         self.initialize(program)?;
@@ -65,7 +60,7 @@ mod tests {
 
     #[test]
     fn index() {
-        let vm = Vm::new([Value64::default(); HEAP_SIZE]);
+        let vm = Vm::new([Value64::default(); HEAP_SIZE]).unwrap();
 
         assert_eq!(vm.memory.get().unwrap(), Default::default());
     }
