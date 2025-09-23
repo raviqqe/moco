@@ -17,15 +17,22 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
     }
 
     /// Runs a program.
-    pub fn run(&self, program: &[u8]) -> Result<(), Error> {
+    pub fn run(&mut self, program: &[u8]) -> Result<(), Error> {
         self.initialize(program)?;
 
         loop {
             let index = self.index(CODE)?;
             let instruction = self.memory.get(index)?;
+            let tag = Cons::from(instruction).tag();
+            let address = (tag >> 1) as usize;
 
-            match Cons::from(instruction).tag() {
-                Instruction::CONS => {}
+            match tag & 1 {
+                Instruction::CONS => {
+                    let index = self.index(address)?;
+                    let value = self.memory.get(index)?;
+                    let cons = self.memory.allocate(Default::default(), value)?;
+                    self.memory.set(index, cons.into())?;
+                }
                 instruction => {
                     debug_assert_eq!(instruction, Instruction::MOVE);
                 }
