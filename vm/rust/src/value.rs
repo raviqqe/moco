@@ -42,11 +42,11 @@ pub trait Value:
 
     /// Converts a value to a cons.
     #[inline]
-    fn to_cons(self) -> Option<Cons<Self>> {
+    fn to_cons(self) -> Result<Cons<Self>, Self::Number> {
         if self.is_pointer() {
-            Some(Cons::from(self))
+            Ok(Cons::from(self))
         } else {
-            None
+            Err(self.into())
         }
     }
 }

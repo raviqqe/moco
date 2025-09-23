@@ -18,8 +18,8 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
     pub fn run(&mut self, program: &[u8]) -> Result<(), Error> {
         self.initialize(program)?;
 
-        while let Some(mut cons) = self.memory.get(self.index(C)?)?.to_cons() {
-            while let Some(instruction) = self.memory.get(cons.index() + 1)?.to_cons() {
+        while let Ok(mut cons) = self.memory.get(self.index(C)?)?.to_cons() {
+            while let Ok(instruction) = self.memory.get(cons.index() + 1)?.to_cons() {
                 let operand = self.memory.get(cons.index())?;
                 let tag = instruction.tag();
                 let index = self.index((tag >> 1) as _)?;
@@ -36,10 +36,9 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
 
                         self.memory.set(
                             index,
-                            if let Some(cons) = operand.to_cons() {
-                                cons.into()
-                            } else {
-                                self.memory.get(operand.into().to_usize())?
+                            match operand.to_cons() {
+                                Ok(cons) => cons.into(),
+                                Err(number) => self.memory.get(number.to_usize())?,
                             },
                         )?;
                     }

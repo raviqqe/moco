@@ -323,10 +323,10 @@ mod tests {
             other_memory: &Memory<V, [V; N]>,
             x: V,
         ) {
-            if x.is_pointer() && !values.contains(&x) {
-                values.insert(x);
-
-                let x = Cons::from(x);
+            if let Ok(x) = x.to_cons()
+                && !values.contains(&x.into())
+            {
+                values.insert(x.into());
 
                 for field in [0, 1] {
                     let index = x.index() + field;
