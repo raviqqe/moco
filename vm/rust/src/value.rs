@@ -55,7 +55,7 @@ pub trait Value:
     fn to_number(self) -> Result<Self::Number, Cons<Self>> {
         match self.to_cons() {
             Ok(cons) => Err(cons),
-            Err(number) => Err(number),
+            Err(number) => Ok(number),
         }
     }
 }
