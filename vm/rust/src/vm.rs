@@ -20,7 +20,7 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
 
         while let Some(mut cons) = self.memory.get(self.index(C)?)?.to_cons() {
             while let Some(instruction) = self.memory.get(cons.index() + 1)?.to_cons() {
-                let operand: V = self.memory.get(cons.index())?;
+                let operand = self.memory.get(cons.index())?;
                 let tag = instruction.tag();
                 let index = self.index((tag >> 1) as _)?;
 
