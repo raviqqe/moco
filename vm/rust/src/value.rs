@@ -49,6 +49,15 @@ pub trait Value:
             Err(self.into())
         }
     }
+
+    /// Converts a value to a number.
+    #[inline]
+    fn to_number(self) -> Result<Self::Number, Cons<Self>> {
+        match self.to_cons() {
+            Ok(cons) => Err(cons),
+            Err(number) => Err(number),
+        }
+    }
 }
 
 /// A 16-bit value.
