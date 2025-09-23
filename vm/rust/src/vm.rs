@@ -1,6 +1,6 @@
 use crate::{Cons, Error, Heap, Memory, Value, instruction::Instruction};
 
-const CODE: usize = 0b101;
+const CODE: usize = 0b11;
 
 /// A virtual machine.
 #[derive(Debug)]
@@ -21,7 +21,8 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
         self.initialize(program)?;
 
         loop {
-            let instruction = self.memory.get(self.index(CODE)?)?;
+            let index = self.index(CODE)?;
+            let instruction = self.memory.get()?;
 
             match Cons::from(instruction).tag() {
                 Instruction::CONS => {}
