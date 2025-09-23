@@ -67,7 +67,7 @@ mod tests {
         let cons = vm.memory.allocate(1.into(), 2.into()).unwrap();
         vm.memory.set_root(cons.into());
 
-        assert_eq!(vm.memory.get(0b10).unwrap(), 1i64.into());
-        assert_eq!(vm.memory.get(0b11).unwrap(), 2i64.into());
+        assert_eq!(vm.memory.get(vm.index(0b10).unwrap()).unwrap(), 1i64.into());
+        assert_eq!(vm.memory.get(vm.index(0b11).unwrap()).unwrap(), 2i64.into());
     }
 }
