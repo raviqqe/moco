@@ -35,6 +35,7 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
                 }
                 instruction => {
                     debug_assert_eq!(instruction, Instruction::MOVE);
+                    todo!();
                 }
             }
         }
