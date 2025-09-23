@@ -20,14 +20,15 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
 
         while let Some(mut cons) = self.memory.get(self.index(C)?)?.to_cons() {
             while let Some(instruction) = self.memory.get(cons.index() + 1)?.to_cons() {
+                let operand = self.memory.get(cons.index())?;
                 let tag = instruction.tag();
-                let address = (tag >> 1) as usize;
+                let index = self.index((tag >> 1) as _)?;
 
                 match tag & 1 {
                     Instruction::CONS => {
-                        let index = self.index(address)?;
                         let value = self.memory.get(index)?;
-                        let cons = self.memory.allocate(Default::default(), value)?;
+                        let cons = self.memory.allocate(operand, value)?;
+
                         self.memory.set(index, cons.into())?;
                     }
                     instruction => {
