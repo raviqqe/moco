@@ -45,6 +45,7 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
     }
 
     fn initialize(&self, _program: &[u8]) -> Result<(), Error> {
+        // TODO
         Ok(())
     }
 }
