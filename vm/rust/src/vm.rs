@@ -3,6 +3,7 @@ use crate::{Cons, Error, Heap, Memory, Value, instruction::Instruction};
 const CODE: usize = 0b101;
 
 /// A virtual machine.
+#[derive(Debug)]
 pub struct Vm<V, H> {
     memory: Memory<V, H>,
 }
@@ -13,6 +14,11 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
         Ok(Self {
             memory: Memory::new(heap)?,
         })
+    }
+
+    #[cfg(test)]
+    pub(crate) fn memory_mut(&mut self) -> &mut Memory<V, H> {
+        &mut self.memory
     }
 
     /// Runs a program.
@@ -47,5 +53,20 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
 
     fn initialize(&self, _program: &[u8]) -> Result<(), Error> {
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Value64;
+
+    const HEAP_SIZE: usize = 1 << 8;
+
+    #[test]
+    fn index() {
+        let vm = Vm::new([Value64::default(); HEAP_SIZE]);
+
+        assert_eq!(vm.memory.get().unwrap(), Default::default());
     }
 }
