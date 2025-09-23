@@ -324,10 +324,8 @@ mod tests {
             x: V,
         ) {
             if let Ok(x) = x.to_cons()
-                && !values.contains(&x.into())
+                && values.insert(x.into())
             {
-                values.insert(x.into());
-
                 for field in [0, 1] {
                     let index = x.index() + field;
                     let value = memory.get(index).unwrap();
