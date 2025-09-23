@@ -59,9 +59,15 @@ mod tests {
     const HEAP_SIZE: usize = 1 << 8;
 
     #[test]
-    fn index() {
-        let vm = Vm::new([Value64::default(); HEAP_SIZE]).unwrap();
+    fn index_default() {
+        let mut vm = Vm::new([Value64::default(); HEAP_SIZE]).unwrap();
 
-        assert_eq!(vm.memory.get().unwrap(), Default::default());
+        assert_eq!(vm.memory.get(0b1).unwrap(), Default::default());
+
+        let cons = vm.memory.allocate(1.into(), 2.into()).unwrap();
+        vm.memory.set_root(cons.into());
+
+        assert_eq!(vm.memory.get(0b10).unwrap(), 1i64.into());
+        assert_eq!(vm.memory.get(0b11).unwrap(), 2i64.into());
     }
 }
