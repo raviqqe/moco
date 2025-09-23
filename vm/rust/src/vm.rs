@@ -39,9 +39,7 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
             index += address & 1;
             address >>= 1;
             address != 1
-        } {
-            Cons::from(self.memory.get(index)?).index();
-        }
+        } {}
 
         Ok(index)
     }
