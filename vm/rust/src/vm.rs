@@ -19,7 +19,7 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
         self.initialize(program)?;
 
         while let Some(mut cons) = self.memory.get(self.index(C)?)?.to_cons() {
-            while let Some(cdr) = self.memory.get(cons.index())?.to_cons() {
+            while let Some(cons) = self.memory.get(cons.index())?.to_cons() {
                 let cdr = self.memory.get(cons.index() + 1)?.to_cons();
                 let tag = Cons::from(instruction).tag();
                 let address = (tag >> 1) as usize;
