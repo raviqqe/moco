@@ -37,9 +37,10 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
                         let value = if let Some(cons) = operand.to_cons() {
                             cons.into()
                         } else {
-                            self.memory.get(V::Number::from(operand).to_usize())?
+                            self.memory.get(operand.into().to_usize())?
                         };
-                        self.memory.set(index, cons.into())?;
+
+                        self.memory.set(index, value)?;
                     }
                 }
 
