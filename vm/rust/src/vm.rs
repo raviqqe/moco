@@ -34,13 +34,14 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
                     instruction => {
                         debug_assert_eq!(instruction, Instruction::MOVE);
 
-                        let value = if let Some(cons) = operand.to_cons() {
-                            cons.into()
-                        } else {
-                            self.memory.get(operand.into().to_usize())?
-                        };
-
-                        self.memory.set(index, value)?;
+                        self.memory.set(
+                            index,
+                            if let Some(cons) = operand.to_cons() {
+                                cons.into()
+                            } else {
+                                self.memory.get(operand.into().to_usize())?
+                            },
+                        )?;
                     }
                 }
 
