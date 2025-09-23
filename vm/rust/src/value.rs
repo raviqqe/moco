@@ -39,6 +39,16 @@ pub trait Value:
 
     /// Returns `true` if a value is marked.
     fn is_marked(self) -> bool;
+
+    /// Converts a value to a cons.
+    #[inline]
+    fn to_cons(self) -> Option<Cons<Self>> {
+        if self.is_pointer() {
+            Some(Cons::from(self))
+        } else {
+            None
+        }
+    }
 }
 
 /// A 16-bit value.

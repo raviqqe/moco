@@ -1,14 +1,12 @@
 use crate::{Cons, Error, Heap, Memory, Value, instruction::Instruction};
 
-const CODE: usize = 0b11;
-
 /// A virtual machine.
 #[derive(Debug)]
-pub struct Vm<V, H> {
+pub struct Vm<V, H, const C: usize> {
     memory: Memory<V, H>,
 }
 
-impl<V: Value, H: Heap<V>> Vm<V, H> {
+impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
     /// Creates a virtual machine.
     pub fn new(heap: H) -> Result<Self, Error> {
         Ok(Self {
@@ -20,25 +18,28 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
     pub fn run(&mut self, program: &[u8]) -> Result<(), Error> {
         self.initialize(program)?;
 
-        loop {
-            let index = self.index(CODE)?;
-            let instruction = self.memory.get(index)?;
-            let tag = Cons::from(instruction).tag();
-            let address = (tag >> 1) as usize;
+        while let Some(mut cons) = self.memory.get(self.index(C)?)?.to_cons() {
+            while let Some(cdr) = self.memory.get(cons.index())?.to_cons() {
+                let cdr = self.memory.get(cons.index() + 1)?.to_cons();
+                let tag = Cons::from(instruction).tag();
+                let address = (tag >> 1) as usize;
 
-            match tag & 1 {
-                Instruction::CONS => {
-                    let index = self.index(address)?;
-                    let value = self.memory.get(index)?;
-                    let cons = self.memory.allocate(Default::default(), value)?;
-                    self.memory.set(index, cons.into())?;
-                }
-                instruction => {
-                    debug_assert_eq!(instruction, Instruction::MOVE);
-                    todo!();
+                match tag & 1 {
+                    Instruction::CONS => {
+                        let index = self.index(address)?;
+                        let value = self.memory.get(index)?;
+                        let cons = self.memory.allocate(Default::default(), value)?;
+                        self.memory.set(index, cons.into())?;
+                    }
+                    instruction => {
+                        debug_assert_eq!(instruction, Instruction::MOVE);
+                        todo!();
+                    }
                 }
             }
         }
+
+        Ok(())
     }
 
     fn index(&self, mut address: usize) -> Result<usize, Error> {
@@ -68,7 +69,7 @@ mod tests {
 
     #[test]
     fn index_default() {
-        let mut vm = Vm::new([Value64::default(); HEAP_SIZE]).unwrap();
+        let mut vm = Vm::<_, _, 0b11>::new([Value64::default(); HEAP_SIZE]).unwrap();
 
         assert_eq!(vm.memory.get(0b1).unwrap(), Default::default());
 
