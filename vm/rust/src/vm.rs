@@ -1,4 +1,4 @@
-use crate::{Cons, Error, Heap, Memory, Value, instruction::Instruction};
+use crate::{Cons, Error, Heap, Integer, Memory, Value, instruction::Instruction};
 
 /// A virtual machine.
 #[derive(Debug)]
@@ -20,7 +20,7 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
 
         while let Some(mut cons) = self.memory.get(self.index(C)?)?.to_cons() {
             while let Some(instruction) = self.memory.get(cons.index() + 1)?.to_cons() {
-                let operand = self.memory.get(cons.index())?;
+                let operand: V = self.memory.get(cons.index())?;
                 let tag = instruction.tag();
                 let index = self.index((tag >> 1) as _)?;
 
@@ -33,7 +33,13 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
                     }
                     instruction => {
                         debug_assert_eq!(instruction, Instruction::MOVE);
-                        todo!();
+
+                        let value = if let Some(cons) = operand.to_cons() {
+                            cons.into()
+                        } else {
+                            self.memory.get(V::Number::from(operand).to_usize())?
+                        };
+                        self.memory.set(index, cons.into())?;
                     }
                 }
 
