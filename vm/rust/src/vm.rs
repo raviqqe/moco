@@ -22,7 +22,7 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
 
         loop {
             let index = self.index(CODE)?;
-            let instruction = self.memory.get()?;
+            let instruction = self.memory.get(index)?;
 
             match Cons::from(instruction).tag() {
                 Instruction::CONS => {}
