@@ -39,7 +39,7 @@ impl<V: Value, H: Heap<V>> Vm<V, H> {
         while {
             index += address & 1;
             address >>= 1;
-            address != 1
+            address > 1
         } {}
 
         Ok(index)
