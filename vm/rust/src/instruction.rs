@@ -10,6 +10,6 @@ pub enum Instruction {
 }
 
 impl Instruction {
-    pub(crate) const CONS: Tag = Instruction::Cons as _;
-    pub(crate) const MOVE: Tag = Instruction::Move as _;
+    pub(crate) const CONS: Tag = Self::Cons as _;
+    pub(crate) const MOVE: Tag = Self::Move as _;
 }

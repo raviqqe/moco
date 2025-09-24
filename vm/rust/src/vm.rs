@@ -68,9 +68,11 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
         Ok(index)
     }
 
+    #[expect(clippy::unused_self)]
     fn initialize(&mut self, bytecode: impl IntoIterator<Item = u8>) -> Result<(), super::Error> {
         let mut bytecode = bytecode.into_iter();
 
+        #[expect(clippy::while_let_on_iterator)]
         while let Some(_byte) = bytecode.next() {}
 
         Ok(())
