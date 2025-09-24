@@ -68,16 +68,30 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
         Ok(index)
     }
 
-    #[expect(clippy::unused_self)]
     fn initialize(&mut self, bytecode: impl IntoIterator<Item = u8>) -> Result<(), super::Error> {
         let mut bytecode = bytecode.into_iter();
 
-        while let Some(byte) = bytecode.next() {}
+        while let Some(byte) = bytecode.next() {
+            if byte & 0b1 == 0 {
+                let number = Self::decode_number(Self::decode_integer_tail(
+                    &mut bytecode,
+                    byte >> 1,
+                    1 << 6,
+                )?);
+            } else if foo {
+                todo!()
+            } else {
+                todo!()
+            }
+        }
 
         Ok(())
     }
 
-    #[expect(dead_code)]
+    fn decode_number(integer: u64) -> V::Number {
+        V::Number::from_i64(if integer & 1 == 0 { 1i64 } else { -1 } * (integer >> 1) as i64)
+    }
+
     fn decode_integer_tail(
         bytecode: &mut impl Iterator<Item = u8>,
         mut x: u8,
