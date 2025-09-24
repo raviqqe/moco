@@ -76,6 +76,7 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
         Ok(())
     }
 
+    #[expect(dead_code)]
     fn decode_integer_tail(
         bytecode: &mut impl Iterator<Item = u8>,
         mut x: u8,
