@@ -3,7 +3,7 @@ use crate::{Cons, error::Error, heap::Heap, value::Value};
 /// A memory on a virtual machine.
 #[derive(Debug, Default)]
 #[cfg_attr(test, derive(Clone))]
-pub struct Memory<V: Value, H: Heap<V>> {
+pub struct Memory<V, H> {
     heap: H,
     root: V,
     free: V,
@@ -323,11 +323,9 @@ mod tests {
             other_memory: &Memory<V, [V; N]>,
             x: V,
         ) {
-            if x.is_pointer() && !values.contains(&x) {
-                values.insert(x);
-
-                let x = Cons::from(x);
-
+            if let Ok(x) = x.to_cons()
+                && values.insert(x.into())
+            {
                 for field in [0, 1] {
                     let index = x.index() + field;
                     let value = memory.get(index).unwrap();
