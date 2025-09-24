@@ -79,7 +79,7 @@ mod tests {
     const HEAP_SIZE: usize = 1 << 8;
 
     #[test]
-    fn index_default() {
+    fn index() {
         let mut vm = Vm::<_, _, 0b11>::new([Value64::default(); HEAP_SIZE]).unwrap();
 
         assert_eq!(vm.memory.get(0b1).unwrap(), Default::default());
