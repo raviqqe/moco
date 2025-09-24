@@ -72,7 +72,7 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
     fn initialize(&mut self, bytecode: impl IntoIterator<Item = u8>) -> Result<(), super::Error> {
         let mut bytecode = bytecode.into_iter();
 
-        while let Some(x) = bytecode.next() {}
+        while let Some(byte) = bytecode.next() {}
 
         Ok(())
     }
