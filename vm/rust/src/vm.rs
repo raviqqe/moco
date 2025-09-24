@@ -1,4 +1,7 @@
-use crate::{Cons, Error, Heap, Integer, Memory, Value, instruction::Instruction};
+use crate::{
+    Cons, Error, Heap, Integer, Memory, Value, configuration::INTEGER_BASE,
+    instruction::Instruction,
+};
 
 /// A virtual machine.
 #[derive(Debug)]
@@ -15,7 +18,7 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
     }
 
     /// Runs a program.
-    pub fn run(&mut self, program: &[u8]) -> Result<(), Error> {
+    pub fn run(&mut self, program: impl IntoIterator<Item = u8>) -> Result<(), Error> {
         self.initialize(program)?;
 
         while let Ok(mut cons) = self.memory.get(self.index(C)?)?.to_cons() {
@@ -65,9 +68,28 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
         Ok(index)
     }
 
-    fn initialize(&self, _program: &[u8]) -> Result<(), Error> {
-        // TODO
+    fn initialize(&mut self, bytecode: impl IntoIterator<Item = u8>) -> Result<(), super::Error> {
+        let mut bytecode = bytecode.into_iter();
+
+        while let Some(_byte) = bytecode.next() {}
+
         Ok(())
+    }
+
+    fn decode_integer_tail(
+        bytecode: &mut impl Iterator<Item = u8>,
+        mut x: u8,
+        mut base: u64,
+    ) -> Result<u64, Error> {
+        let mut y = (x >> 1) as u64;
+
+        while x & 1 != 0 {
+            x = bytecode.next().ok_or(Error::BytecodeEnd)?;
+            y += (x as u64 >> 1) * base;
+            base *= INTEGER_BASE;
+        }
+
+        Ok(y)
     }
 }
 

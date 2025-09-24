@@ -7,6 +7,7 @@ extern crate alloc;
 #[cfg(test)]
 extern crate std;
 
+mod configuration;
 mod cons;
 mod error;
 mod heap;
