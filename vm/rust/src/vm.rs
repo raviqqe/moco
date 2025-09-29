@@ -88,6 +88,8 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
         Ok(())
     }
 
+    fn push(&mut self) -> foo {}
+
     fn decode_number(integer: u64) -> V::Number {
         V::Number::from_i64(if integer & 1 == 0 { 1i64 } else { -1 } * (integer >> 1) as i64)
     }
