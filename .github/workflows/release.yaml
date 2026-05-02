@@ -17,10 +17,10 @@ jobs:
       run:
         working-directory: vm/rust
     steps:
-      - uses: actions/checkout@v6
-      - uses: raviqqe/cargo-cache@v1
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: raviqqe/cargo-cache@98cf6adfd93fe558bc3ae1735b97f10998f2067f # v1.0.3
       - run: cargo install cargo-workspaces
-      - uses: rust-lang/crates-io-auth-action@v1
+      - uses: rust-lang/crates-io-auth-action@b7e9a28eded4986ec6b1fa40eeee8f8f165559ec # v1.0.3
         id: auth
         if: github.ref == 'refs/heads/main'
       - run: cargo workspaces publish -y --from-git ${{ github.ref != 'refs/heads/main' && '--dry-run' || '' }}

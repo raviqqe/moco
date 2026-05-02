@@ -17,8 +17,8 @@ jobs:
       run:
         working-directory: vm/rust
     steps:
-      - uses: actions/checkout@v6
-      - uses: raviqqe/cargo-cache@v1
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: raviqqe/cargo-cache@98cf6adfd93fe558bc3ae1735b97f10998f2067f # v1.0.3
       - run: cargo build ${{ matrix.options }}
       - run: cargo fmt -- --check
       - run: cargo clippy ${{ matrix.options }} -- -D warnings
