@@ -1,5 +1,4 @@
-use crate::Integer;
-use crate::cons::Cons;
+use crate::{Integer, cons::Cons};
 use core::fmt::Debug;
 
 /// A value.

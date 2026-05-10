@@ -1,6 +1,5 @@
 use crate::{
-    Cons, Error, Heap, Integer, Memory, Value, configuration::INTEGER_BASE,
-    instruction::Instruction,
+    Cons, Error, Heap, Integer, Memory, Value, config::INTEGER_BASE, instruction::Instruction,
 };
 
 /// A virtual machine.
