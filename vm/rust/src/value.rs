@@ -240,4 +240,5 @@ mod tests {
     test_value!(value16, Value16);
     test_value!(value32, Value32);
     test_value!(value64, Value64);
+    test_value!(value128, Value128);
 }
