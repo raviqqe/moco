@@ -151,7 +151,7 @@ impl_value!(Value128, i128, u128);
 mod tests {
     use super::*;
 
-    macro_rules! test_value {
+    macro_rules! test {
         ($name:ident, $value:ty) => {
             mod $name {
                 use super::*;
@@ -237,8 +237,8 @@ mod tests {
         };
     }
 
-    test_value!(value16, Value16);
-    test_value!(value32, Value32);
-    test_value!(value64, Value64);
-    test_value!(value128, Value128);
+    test!(value16, Value16);
+    test!(value32, Value32);
+    test!(value64, Value64);
+    test!(value128, Value128);
 }
