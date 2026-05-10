@@ -40,6 +40,7 @@ impl<V: Value> Cons<V> {
         self.set_pointer(self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | tag.into())
     }
 
+    #[inline]
     fn set_pointer(self, pointer: V::Pointer) -> Self {
         Self(self.0.set_pointer(pointer))
     }
