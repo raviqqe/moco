@@ -48,7 +48,7 @@ macro_rules! impl_integer {
     ($type:ty) => {
         impl Integer for $type {
             const BITS: usize = Self::BITS as _;
-            // TODO Fix this.
+            // TODO Mask integers including sign bits.
             const MASK: Self = Self::MAX;
 
             fn from_i64(value: i64) -> Self {
