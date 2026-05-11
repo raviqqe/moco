@@ -36,6 +36,7 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
 
                         self.memory.set(
                             index,
+                            // TODO Use `index` calculation first?
                             self.memory.get(
                                 operand
                                     .to_number()
