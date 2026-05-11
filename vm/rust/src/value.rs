@@ -71,6 +71,10 @@ pub struct Value32(u32);
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value64(u64);
 
+/// A 128-bit value.
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Value128(u128);
+
 macro_rules! impl_value {
     ($value:ty, $number:ty, $pointer:ty) => {
         impl Value for $value {
@@ -141,12 +145,13 @@ macro_rules! impl_value {
 impl_value!(Value16, i16, u16);
 impl_value!(Value32, i32, u32);
 impl_value!(Value64, i64, u64);
+impl_value!(Value128, i128, u128);
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    macro_rules! test_value {
+    macro_rules! test {
         ($name:ident, $value:ty) => {
             mod $name {
                 use super::*;
@@ -232,7 +237,8 @@ mod tests {
         };
     }
 
-    test_value!(value16, Value16);
-    test_value!(value32, Value32);
-    test_value!(value64, Value64);
+    test!(value16, Value16);
+    test!(value32, Value32);
+    test!(value64, Value64);
+    test!(value128, Value128);
 }

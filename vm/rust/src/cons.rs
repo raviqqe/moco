@@ -30,7 +30,7 @@ impl<V: Value> Cons<V> {
     #[inline]
     pub fn set_index(self, index: usize) -> Self {
         self.set_pointer(
-            self.0.to_pointer() & Tag::MAX.into() | (V::Pointer::from_usize(index) << Tag::BITS),
+            (V::Pointer::from_usize(index) << Tag::BITS) | self.0.to_pointer() & Tag::MAX.into(),
         )
     }
 
@@ -40,11 +40,11 @@ impl<V: Value> Cons<V> {
         self.set_pointer(self.0.to_pointer() & !V::Pointer::from(Tag::MAX) | tag.into())
     }
 
+    #[inline]
     fn set_pointer(self, pointer: V::Pointer) -> Self {
         Self(self.0.set_pointer(pointer))
     }
 
-    /// Converts a cons to a value.
     #[inline]
     pub(crate) const fn to_value(self) -> V {
         self.0
