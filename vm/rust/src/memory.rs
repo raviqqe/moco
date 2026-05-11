@@ -1,6 +1,6 @@
 use crate::{Cons, error::Error, heap::Heap, value::Value};
 
-/// A memory on a virtual machine.
+/// A memory.
 #[derive(Debug, Default)]
 #[cfg_attr(test, derive(Clone))]
 pub struct Memory<V, H> {
