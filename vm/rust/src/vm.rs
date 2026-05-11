@@ -29,7 +29,6 @@ impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
                 match tag & 1 {
                     Instruction::CONS => {
                         let cons = self.memory.allocate(operand, self.memory.get(index)?)?;
-
                         self.memory.set(index, cons.into())?;
                     }
                     instruction => {
