@@ -93,7 +93,7 @@ macro_rules! impl_value {
 
             #[inline]
             fn set_pointer(self, pointer: Self::Pointer) -> Self {
-                Self(self.0 & 0b11 | (pointer << 2))
+                Self((pointer << 2) | self.0 & 0b11)
             }
 
             #[inline]
