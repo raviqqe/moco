@@ -1,4 +1,4 @@
-/// A heap memory.
+/// A heap.
 pub trait Heap<T>: AsRef<[T]> + AsMut<[T]> {}
 
 impl<T> Heap<T> for &mut [T] {}
