@@ -75,6 +75,10 @@ pub struct Value64(u64);
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Value128(u128);
 
+/// A pointer-sized value.
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct ValueSize(usize);
+
 macro_rules! impl_value {
     ($value:ty, $number:ty, $pointer:ty) => {
         impl Value for $value {
@@ -146,6 +150,7 @@ impl_value!(Value16, i16, u16);
 impl_value!(Value32, i32, u32);
 impl_value!(Value64, i64, u64);
 impl_value!(Value128, i128, u128);
+impl_value!(ValueSize, isize, usize);
 
 #[cfg(test)]
 mod tests {
@@ -241,4 +246,5 @@ mod tests {
     test!(value32, Value32);
     test!(value64, Value64);
     test!(value128, Value128);
+    test!(value_size, ValueSize);
 }
