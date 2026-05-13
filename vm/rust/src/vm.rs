@@ -1,18 +1,21 @@
 use crate::{
-    Cons, Error, Heap, Integer, Memory, Value, config::INTEGER_BASE, instruction::Instruction,
+    Cons, Error, Heap, Integer, Memory, OperationSet, Value, config::INTEGER_BASE,
+    instruction::Instruction,
 };
 
 /// A virtual machine.
 #[derive(Debug)]
-pub struct Vm<V, H, const C: usize> {
+pub struct Vm<V, H, const C: usize, O: OperationSet<V, H>> {
     memory: Memory<V, H>,
+    operation_set: O,
 }
 
-impl<V: Value, H: Heap<V>, const C: usize> Vm<V, H, C> {
+impl<V: Value, H: Heap<V>, const C: usize, O: OperationSet<V, H>> Vm<V, H, C, O> {
     /// Creates a virtual machine.
-    pub fn new(heap: H) -> Result<Self, Error> {
+    pub fn new(heap: H, operation_set: O) -> Result<Self, Error> {
         Ok(Self {
             memory: Memory::new(heap)?,
+            operation_set,
         })
     }
 
