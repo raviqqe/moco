@@ -6,5 +6,5 @@ pub trait OperationSet<V, H> {
     type Error;
 
     /// Runs an operation.
-    fn operate(&mut self, memory: &mut Memory<V, H>, primitive: usize) -> Result<(), Self::Error>;
+    fn operate(&mut self, memory: &mut Memory<V, H>, code: usize) -> Result<(), Self::Error>;
 }
