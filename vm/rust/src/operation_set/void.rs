@@ -6,7 +6,7 @@ pub struct VoidOperationSet {}
 
 impl VoidOperationSet {
     /// Creates an operation set.
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {}
     }
 }
