@@ -39,12 +39,10 @@ impl<V: Value, H: Heap<V>, const C: usize, O: OperationSet<V, H>> Vm<V, H, C, O>
 
                         self.memory.set(
                             index,
-                            self.operation_set.operate(
-                                operand
-                                    .to_number()
-                                    .map_err(|_| Error::NumberExpected)?
-                                    .to_usize(),
-                            )?,
+                            operand
+                                .to_number()
+                                .map_err(|_| Error::NumberExpected)?
+                                .to_usize(),
                         )?;
                     }
                 }
