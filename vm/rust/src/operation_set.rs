@@ -1,8 +1,7 @@
 mod void;
 
-pub use void::VoidOperationSet;
-
 use crate::Memory;
+pub use void::VoidOperationSet;
 
 /// An operation set.
 pub trait OperationSet<V, H> {
