@@ -61,6 +61,7 @@ impl<V: Value, H: Heap<V>, const C: usize, O: OperationSet<V, H>> Vm<V, H, C, O>
         let mut index = Cons::from(self.memory.root()).index();
 
         while {
+            // TODO Fix this?
             index += address & 1;
             address >>= 1;
             address > 1
