@@ -23,6 +23,6 @@ pub use error::Error;
 pub use heap::Heap;
 pub use integer::Integer;
 pub use memory::Memory;
-pub use operation_set::OperationSet;
+pub use operation_set::{OperationSet, VoidOperationSet};
 pub use value::{Value, Value16, Value32, Value64, Value128, ValueSize};
 pub use vm::Vm;

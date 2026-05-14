@@ -100,13 +100,14 @@ impl<V: Value, H: Heap<V>, const C: usize, O: OperationSet<V, H>> Vm<V, H, C, O>
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Value64;
+    use crate::{Value64, operation_set::VoidOperationSet};
 
     const HEAP_SIZE: usize = 1 << 8;
 
     #[test]
     fn index() {
-        let mut vm = Vm::<_, _, 0b11>::new([Value64::default(); HEAP_SIZE]).unwrap();
+        let mut vm =
+            Vm::<_, _, 0b11, _>::new([Value64::default(); HEAP_SIZE], VoidOperationSet).unwrap();
 
         assert_eq!(vm.memory.get(0b1).unwrap(), Default::default());
 

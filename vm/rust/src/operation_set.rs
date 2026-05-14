@@ -1,5 +1,7 @@
 mod void;
 
+pub use void::VoidOperationSet;
+
 use crate::Memory;
 
 /// An operation set.
