@@ -1,6 +1,6 @@
 use crate::{Memory, OperationSet};
 
-/// An operation set that runs no operation.
+/// A void operation set that runs no operation.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct VoidOperationSet {}
 
