@@ -1,7 +1,7 @@
 use crate::{Memory, OperationSet};
 
-/// A void operation set that runs no operation.
-#[derive(Clone, Copy, Debug, Default)]
+/// A void operation set.
+#[derive(Debug, Default)]
 pub struct VoidOperationSet {}
 
 impl VoidOperationSet {
@@ -31,6 +31,6 @@ mod tests {
         let mut memory =
             Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
-        assert!(VoidOperationSet.operate(&mut memory, 0).is_err());
+        assert!(VoidOperationSet::new().operate(&mut memory, 0).is_err());
     }
 }
