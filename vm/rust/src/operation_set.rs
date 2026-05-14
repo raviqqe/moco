@@ -1,3 +1,5 @@
+mod void;
+
 use crate::Memory;
 
 /// An operation set.
