@@ -107,7 +107,8 @@ mod tests {
     #[test]
     fn index() {
         let mut vm =
-            Vm::<_, _, 0b11, _>::new([Value64::default(); HEAP_SIZE], VoidOperationSet).unwrap();
+            Vm::<_, _, 0b11, _>::new([Value64::default(); HEAP_SIZE], VoidOperationSet::new())
+                .unwrap();
 
         assert_eq!(vm.memory.get(0b1).unwrap(), Default::default());
 
