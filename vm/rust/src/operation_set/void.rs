@@ -15,7 +15,7 @@ impl<V, H> OperationSet<V, H> for VoidOperationSet {
     type Error = &'static str;
 
     fn operate(&mut self, _memory: &mut Memory<V, H>, _code: usize) -> Result<(), Self::Error> {
-        Err("no operation in void operation set")
+        Err("invalid operation")
     }
 }
 
