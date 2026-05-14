@@ -5,10 +5,10 @@ use crate::{Memory, OperationSet};
 pub struct VoidOperationSet;
 
 impl<V, H> OperationSet<V, H> for VoidOperationSet {
-    type Error = ();
+    type Error = &'static str;
 
     fn operate(&mut self, _memory: &mut Memory<V, H>, _code: usize) -> Result<(), Self::Error> {
-        Ok(())
+        Err("no operation in void operation set")
     }
 }
 
@@ -24,6 +24,6 @@ mod tests {
         let mut memory =
             Memory::<Value64, [Value64; HEAP_SIZE]>::new([Default::default(); _]).unwrap();
 
-        assert_eq!(VoidOperationSet.operate(&mut memory, 0), Ok(()));
+        assert!(VoidOperationSet.operate(&mut memory, 0).is_err());
     }
 }
