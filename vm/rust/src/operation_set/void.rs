@@ -2,7 +2,14 @@ use crate::{Memory, OperationSet};
 
 /// An operation set that runs no operation.
 #[derive(Clone, Copy, Debug, Default)]
-pub struct VoidOperationSet;
+pub struct VoidOperationSet {}
+
+impl VoidOperationSet {
+    /// Creates an operation set.
+    pub fn new() -> Self {
+        Self {}
+    }
+}
 
 impl<V, H> OperationSet<V, H> for VoidOperationSet {
     type Error = &'static str;
