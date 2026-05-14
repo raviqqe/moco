@@ -7,6 +7,7 @@ use crate::{
 #[derive(Debug)]
 pub struct Vm<V, H, const C: usize, O: OperationSet<V, H>> {
     memory: Memory<V, H>,
+    #[expect(dead_code)]
     operation_set: O,
 }
 
@@ -39,10 +40,12 @@ impl<V: Value, H: Heap<V>, const C: usize, O: OperationSet<V, H>> Vm<V, H, C, O>
 
                         self.memory.set(
                             index,
-                            operand
-                                .to_number()
-                                .map_err(|_| Error::NumberExpected)?
-                                .to_usize(),
+                            self.memory.get(
+                                operand
+                                    .to_number()
+                                    .map_err(|_| Error::NumberExpected)?
+                                    .to_usize(),
+                            )?,
                         )?;
                     }
                 }
