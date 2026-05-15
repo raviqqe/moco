@@ -1,7 +1,7 @@
 //! The Moco command line tool.
 
 use core::error::Error;
-use moco_machine::{Value64, Machine, VoidOperationSet};
+use moco_machine::{Machine, Value64, VoidOperationSet};
 
 const HEAP_SIZE: usize = 1 << 16;
 

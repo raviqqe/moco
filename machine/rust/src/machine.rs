@@ -115,7 +115,13 @@ mod tests {
         let cons = machine.memory.allocate(1.into(), 2.into()).unwrap();
         machine.memory.set_root(cons.into());
 
-        assert_eq!(machine.memory.get(machine.index(0b10).unwrap()).unwrap(), 1i64.into());
-        assert_eq!(machine.memory.get(machine.index(0b11).unwrap()).unwrap(), 2i64.into());
+        assert_eq!(
+            machine.memory.get(machine.index(0b10).unwrap()).unwrap(),
+            1i64.into()
+        );
+        assert_eq!(
+            machine.memory.get(machine.index(0b11).unwrap()).unwrap(),
+            2i64.into()
+        );
     }
 }
