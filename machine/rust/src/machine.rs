@@ -3,7 +3,7 @@ use crate::{
     instruction::Instruction,
 };
 
-/// A virtual machine.
+/// A machine.
 #[derive(Debug)]
 pub struct Machine<V, H, const C: usize, O: OperationSet<V, H>> {
     memory: Memory<V, H>,
@@ -12,7 +12,7 @@ pub struct Machine<V, H, const C: usize, O: OperationSet<V, H>> {
 }
 
 impl<V: Value, H: Heap<V>, const C: usize, O: OperationSet<V, H>> Machine<V, H, C, O> {
-    /// Creates a virtual machine.
+    /// Creates a machine.
     pub fn new(heap: H, operation_set: O) -> Result<Self, Error> {
         Ok(Self {
             memory: Memory::new(heap)?,
