@@ -3,16 +3,16 @@ use crate::{
     instruction::Instruction,
 };
 
-/// A virtual machine.
+/// A machine.
 #[derive(Debug)]
-pub struct Vm<V, H, const C: usize, O: OperationSet<V, H>> {
+pub struct Machine<V, H, const C: usize, O: OperationSet<V, H>> {
     memory: Memory<V, H>,
     #[expect(dead_code)]
     operation_set: O,
 }
 
-impl<V: Value, H: Heap<V>, const C: usize, O: OperationSet<V, H>> Vm<V, H, C, O> {
-    /// Creates a virtual machine.
+impl<V: Value, H: Heap<V>, const C: usize, O: OperationSet<V, H>> Machine<V, H, C, O> {
+    /// Creates a machine.
     pub fn new(heap: H, operation_set: O) -> Result<Self, Error> {
         Ok(Self {
             memory: Memory::new(heap)?,
@@ -106,16 +106,22 @@ mod tests {
 
     #[test]
     fn index() {
-        let mut vm =
-            Vm::<_, _, 0b11, _>::new([Value64::default(); HEAP_SIZE], VoidOperationSet::new())
+        let mut machine =
+            Machine::<_, _, 0b11, _>::new([Value64::default(); HEAP_SIZE], VoidOperationSet::new())
                 .unwrap();
 
-        assert_eq!(vm.memory.get(0b1).unwrap(), Default::default());
+        assert_eq!(machine.memory.get(0b1).unwrap(), Default::default());
 
-        let cons = vm.memory.allocate(1.into(), 2.into()).unwrap();
-        vm.memory.set_root(cons.into());
+        let cons = machine.memory.allocate(1.into(), 2.into()).unwrap();
+        machine.memory.set_root(cons.into());
 
-        assert_eq!(vm.memory.get(vm.index(0b10).unwrap()).unwrap(), 1i64.into());
-        assert_eq!(vm.memory.get(vm.index(0b11).unwrap()).unwrap(), 2i64.into());
+        assert_eq!(
+            machine.memory.get(machine.index(0b10).unwrap()).unwrap(),
+            1i64.into()
+        );
+        assert_eq!(
+            machine.memory.get(machine.index(0b11).unwrap()).unwrap(),
+            2i64.into()
+        );
     }
 }

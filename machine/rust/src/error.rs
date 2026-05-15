@@ -3,7 +3,7 @@ use core::{
     fmt::{self, Debug, Display, Formatter},
 };
 
-/// An error of a virtual machine.
+/// A machine error.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Error {
     /// Unexpected end of bytecode.
